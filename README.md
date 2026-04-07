@@ -38,14 +38,6 @@ El sistema está diseñado bajo una arquitectura de microservicios orientada a e
 3. **Asíncrono (Eventos):** Al crearse una reserva en el `reservation-service`, este publica un evento en un stream de Redis. El `notification-service` consume este stream de forma asíncrona.
 4. **Observabilidad:** Todos los componentes envían telemetría (Logs, Métricas, Trazas) a Data Prepper, que los formatea y envía a OpenSearch.
 
-## Cambios relevantes
-
-- Los servicios que acceden a PostgreSQL usan `psycopg` v3.
-- La URL de conexión en Compose debe usar `postgresql+psycopg://...`.
-- Las trazas se reciben en Data Prepper por OTLP/HTTP y se indexan en OpenSearch con los índices de Trace Analytics.
-- OpenSearch y OpenSearch Dashboards están fijados a `3.5.0`.
-- Data Prepper está fijado a `2.13.0`.
-- OpenSearch y OpenSearch Dashboards se levantan sin el plugin de seguridad para simplificar el entorno local de desarrollo.
 
 ## Requisitos
 
@@ -110,38 +102,6 @@ Ejemplo de payload:
 - Data Prepper Logs OTLP HTTP: `http://localhost:21893/v1/logs`
 - Data Prepper Metrics OTLP HTTP: `http://localhost:21893/v1/metrics`
 
-## Script de Pruebas (Flujo de Reservas)
-
-Se incluye un test de integración E2E en `scripts/test-services.sh` para validar la correcta comunicación y lógica de negocio de los microservicios.
-
-El script automatiza el siguiente flujo:
-
-1. **Healthchecks:** Verifica que `room-service`, `user-service`, `reservation-service` y `notification-service` estén operativos (`/health`).
-2. **Consultas Básicas:** Pide el catálogo de salas filtrado por capacidad y valida la existencia de un usuario.
-3. **Flujo de Reserva:**
-   - Consulta disponibilidad de la Sala 1 en una franja horaria (espera `available: true`).
-   - Ejecuta un `POST /reservations` simulando la reserva del Usuario 1 para esa sala y franja.
-   - Vuelve a consultar la disponibilidad de la Sala 1 en la misma franja (espera `available: false`).
-4. **Validación de Conflictos:**
-   - Intenta enviar el mismo payload de reserva de nuevo.
-   - Valida que el `reservation-service` devuelva un error HTTP `409 Conflict`.
-
-Uso:
-
-```bash
-bash scripts/test-services.sh
-```
-
-Si quieres cambiar el host base o la fecha usada:
-
-```bash
-BASE_URL_ROOM=http://localhost:8081 \
-BASE_URL_USER=http://localhost:8082 \
-BASE_URL_RES=http://localhost:8083 \
-BASE_URL_NOTIFICATION=http://localhost:8084 \
-TEST_DAY=2026-03-12 \
-bash scripts/test-services.sh
-```
 
 ## Reconstrucción sin caché
 
@@ -324,20 +284,4 @@ Esto permite mantener trazas en el pipeline específico de Trace Analytics y log
   [`services/notification-service/main.py`](/home/avr12s/repos/reservas/services/notification-service/main.py#L1)
   [`services/api-gateway/main.py`](/home/avr12s/repos/reservas/services/api-gateway/main.py#L1)
 
-## Troubleshooting
-
-Si Data Prepper muestra errores `failed to parse` contra `otel-v1-apm-span-*`, normalmente hay un conflicto de mapping en los índices de trazas ya creados o una incompatibilidad entre el pipeline de trazas y el formato que espera Trace Analytics.
-
-Tras cambiar la instrumentación o los atributos manuales de spans:
-
-```bash
-docker compose down -v
-docker compose up -d --build
-```
-
-Si prefieres limpiar solo los índices de trazas en OpenSearch:
-
-```bash
-curl -XDELETE http://localhost:9200/otel-v1-apm-span-*
-curl -XDELETE http://localhost:9200/otel-v1-apm-service-map-*
 ```
