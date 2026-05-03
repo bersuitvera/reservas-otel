@@ -279,7 +279,7 @@ En índices:
 ## Documentación interna de servicios
 
 - Detalle del código Python de prueba, responsabilidades por servicio e instrumentación:
-  [`services/README.md`](/home/avr12s/repos/reservas/services/README.md)
+  [`services/README.md`](./services/README.md)
 
 ## Notas operativas
 
