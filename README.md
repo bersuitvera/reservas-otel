@@ -1,287 +1,291 @@
 # Sistema de Reservas - Microservicios
 
-Proyecto de ejemplo con microservicios en Python/FastAPI para gestión de salas, usuarios, reservas y notificaciones, con PostgreSQL, Redis y trazabilidad distribuida en OpenSearch mediante Data Prepper.
+Proyecto de ejemplo con microservicios en Python/FastAPI para gestión de salas, usuarios, reservas y notificaciones, con trazabilidad distribuida en OpenSearch usando OpenTelemetry Collector y Data Prepper.
 
 ## Servicios
 
 | Servicio | Puerto local | Descripción |
 |---|---:|---|
-| Room Service | `8081` | Inventario de salas y filtrado por capacidad. |
+| API Gateway | `8080` | Punto de entrada del flujo funcional. |
+| Room Service | `8081` | Inventario de salas y consulta por id/capacidad. |
 | User Service | `8082` | Consulta básica de usuarios. |
 | Reservation Service | `8083` | Disponibilidad y creación de reservas. |
 | Notification Service | `8084` | Consumidor de eventos desde Redis Streams. |
-| OpenSearch Dashboards | `5601` | Visualización de trazas distribuidas. |
-| OpenSearch API | `9200` | Almacenamiento y consulta de trazas. |
-| Data Prepper API | `4900` | Estado operativo del pipeline de ingestión. |
-| Data Prepper Traces OTLP | `21890` | Receiver OTLP/HTTP para trazas de Trace Analytics. |
-| Data Prepper Logs/Metrics OTLP | `21893` | Receiver OTLP/HTTP para logs y métricas. |
+| OpenSearch API | `9200` | Almacenamiento y consulta de telemetría. |
+| OpenSearch Dashboards | `5601` | Visualización de trazas, logs y métricas. |
+| Data Prepper OTLP gRPC | `21890` | Entrada OTLP unificada (traces/logs/metrics). |
+| Data Prepper API | `4900` | Estado operativo de pipelines. |
+| OTel Collector OTLP gRPC | `4317` | Receiver OTLP gRPC desde servicios. |
+| OTel Collector OTLP HTTP | `4318` | Receiver OTLP HTTP desde servicios. |
 | PostgreSQL | `5432` | Persistencia de salas y reservas. |
-| Redis | `6379` | Cola/event stream para notificaciones. |
+| Redis | `6379` | Bus de eventos para notificaciones. |
 
-## Stack técnico
+## Versiones fijadas
 
-- FastAPI
-- SQLAlchemy
-- PostgreSQL 16
-- Redis 7
-- OpenTelemetry
-- OpenSearch
-- Data Prepper
-- Docker Compose
+- OpenSearch: `3.6.0`
+- OpenSearch Dashboards: `3.6.0`
+- Data Prepper: `2.15.0`
+- OTel Collector Contrib: `0.150.1`
+- PostgreSQL: `16-alpine`
+- Redis: `7-alpine`
 
-## Arquitectura General
+## Arquitectura definitiva
 
-El sistema está diseñado bajo una arquitectura de microservicios orientada a eventos para la gestión de reservas:
-
-1. **Síncrono (API REST):** El `api-gateway` enruta las peticiones hacia `room-service`, `user-service` y `reservation-service`.
-2. **Persistencia:** `room-service` y `reservation-service` mantienen su estado en esquemas separados dentro de PostgreSQL.
-3. **Asíncrono (Eventos):** Al crearse una reserva en el `reservation-service`, este publica un evento en un stream de Redis. El `notification-service` consume este stream de forma asíncrona.
-4. **Observabilidad:** Todos los componentes envían telemetría (Logs, Métricas, Trazas) a Data Prepper, que los formatea y envía a OpenSearch.
-
-
-## Requisitos
-
-- Docker
-- Docker Compose
-- `curl` para ejecutar el script de pruebas
-
-## Levantar el entorno
-
-Desde la raíz del proyecto:
-
-```bash
-docker compose up --build
+```text
+[Microservicios FastAPI]
+    |
+    | OTLP HTTP (4318)
+    v
+[OTel Collector]
+    |
+    | OTLP gRPC (21890)
+    v
+[Data Prepper entry-pipeline]
+    |---- route TRACE  -> traces-raw-pipeline + service-map-pipeline
+    |---- route LOG    -> logs-pipeline
+    \---- route METRIC -> metrics-pipeline
+                     |
+                     v
+               [OpenSearch]
+                     |
+                     v
+          [OpenSearch Dashboards]
 ```
 
-Para recrear solo el stack de observabilidad tras cambios en el pipeline:
+## Modelo de datos (PostgreSQL + eventos)
 
-```bash
-docker compose up -d --force-recreate opensearch opensearch-dashboards data-prepper
+### Diagrama ER (simplificado)
+
+```text
+rooms
+  id (PK)
+  name
+  capacity
+  equipment
+    ^
+    |
+reservations
+  id (PK)
+  room_id
+  user_id
+  start_ts
+  end_ts
+  status
 ```
 
-## Endpoints principales
+Nota: en esta POC `room_id` y `user_id` se validan a nivel de aplicación (no hay FK declaradas en SQL).
 
-### Room Service
+### Esquema de tablas
 
-- `GET http://localhost:8081/health`
-- `GET http://localhost:8081/rooms`
-- `GET http://localhost:8081/rooms?capacity=8`
+Tabla `rooms`:
 
-### User Service
+- `id` `SERIAL` `PRIMARY KEY`
+- `name` `TEXT NOT NULL`
+- `capacity` `INT NOT NULL`
+- `equipment` `TEXT NOT NULL DEFAULT ''`
 
-- `GET http://localhost:8082/health`
-- `GET http://localhost:8082/users/1`
+Tabla `reservations`:
 
-### Reservation Service
+- `id` `SERIAL` `PRIMARY KEY`
+- `room_id` `INT NOT NULL`
+- `user_id` `INT NOT NULL`
+- `start_ts` `TIMESTAMP NOT NULL`
+- `end_ts` `TIMESTAMP NOT NULL`
+- `status` `TEXT NOT NULL DEFAULT 'CONFIRMED'`
 
-- `GET http://localhost:8083/health`
-- `GET http://localhost:8083/availability?room_id=1&start=2026-03-10T10:00:00&end=2026-03-10T11:00:00`
-- `POST http://localhost:8083/reservations`
+### Modelo de evento (Redis Stream `events`)
 
-Ejemplo de payload:
+Evento publicado por `reservation-service`:
 
 ```json
 {
+  "type": "reservation.created",
+  "reservation_id": 13,
   "room_id": 1,
   "user_id": 1,
-  "start": "2026-03-10T10:00:00",
-  "end": "2026-03-10T11:00:00"
+  "trace": {
+    "traceparent": "00-<trace_id>-<span_id>-01"
+  }
 }
 ```
 
-### Notification Service
+## Flujo funcional
 
-- `GET http://localhost:8084/health`
+1. `api-gateway` valida usuario llamando a `user-service`.
+2. `api-gateway` delega creación en `reservation-service`.
+3. `reservation-service` valida sala contra `room-service`.
+4. `reservation-service` comprueba disponibilidad y persiste reserva.
+5. `reservation-service` publica evento `reservation.created` en Redis.
+6. `notification-service` consume ese evento en la misma traza distribuida.
 
-### Observabilidad
-
-- OpenSearch Dashboards: `http://localhost:5601`
-- OpenSearch API: `http://localhost:9200`
-- Data Prepper API: `http://localhost:4900`
-- Data Prepper Traces OTLP HTTP: `http://localhost:21890/v1/traces`
-- Data Prepper Logs OTLP HTTP: `http://localhost:21893/v1/logs`
-- Data Prepper Metrics OTLP HTTP: `http://localhost:21893/v1/metrics`
-
-
-## Reconstrucción sin caché
-
-Si cambias dependencias o la imagen base:
-
-```bash
-docker compose build --no-cache
-```
-
-## Observabilidad
-
-Todos los servicios exportan trazas, logs y métricas a OpenSearch mediante OpenTelemetry y Data Prepper.
-
-- Endpoint OTLP de trazas en Compose: `http://data-prepper:21890/v1/traces`
-- Endpoint OTLP de logs en Compose: `http://data-prepper:21893/v1/logs`
-- Endpoint OTLP de métricas en Compose: `http://data-prepper:21893/v1/metrics`
-- `setup_telemetry()` configura exportación OTLP/HTTP para trazas, logs y métricas
-- Data Prepper recibe OTLP/HTTP en `/v1/traces`, `/v1/logs` y `/v1/metrics`
-- OpenSearch almacena trazas en `otel-v1-apm-span-*` y `otel-v1-apm-service-map*`, logs en `logs-otel-*` y métricas en `metrics-otel-*`
-- La visualización se realiza desde OpenSearch Dashboards en `http://localhost:5601`
-- Room Service y Reservation Service instrumentan SQLAlchemy
-- Reservation Service publica eventos en Redis Streams
-- Notification Service consume esos eventos propagando el contexto de traza
-
-### Arquitectura de Señales y Data Prepper
-
-El proyecto establece dos vías (pipelines) de ingestión en Data Prepper para garantizar compatibilidad nativa con las herramientas de OpenSearch:
+## Ejemplo de traza correcta (reserva confirmada)
 
 ```text
-[ Microservicios ]
-      │
-      ├─(Puerto 21890 / v1/traces)──> Pipeline Trazas ──> Índices Trace Analytics / Service Map
-      │
-      └─(Puerto 21893 / v1/logs|metrics)──> Pipeline General ──> Índices logs-otel-* / metrics-otel-*
+api-gateway
+  ├── GET user-service /users/1
+  │     └── respuesta 200
+  │
+  └── POST reservation-service /reservations
+        ├── reservation.flow.create
+        ├── reservation.validate.room
+        │     └── GET room-service /rooms/1
+        │           └── SELECT rooms WHERE id = 1
+        │
+        ├── reservation.check.availability
+        │     └── SELECT COUNT(*) FROM reservations
+        │
+        ├── reservation.persist.confirmed
+        │     └── INSERT INTO reservations
+        │
+        └── reservation.event.publish
+              └── Redis XADD events
+                    └── notification-service consume reservation.created
 ```
 
-- **Pipeline de Trazas (`21890`):** Usa el conector especializado `otel_trace_source` configurado para exportar datos hacia los sinks `otel_traces` y `service_map`. Esto es obligatorio para que los dashboards de "Trace Analytics" en OpenSearch funcionen correctamente.
-- **Pipeline de Logs y Métricas (`21893`):** Usa el conector genérico `otlp`. Los microservicios mandan directamente logs y métricas por HTTP OTLP, y Data Prepper los guarda en los índices correspondientes (`logs-otel-*` y `metrics-otel-*`).
+## Ejemplo de traza de error (conflicto 409)
 
-### Bootstrap de telemetry
+```text
+api-gateway
+  ├── GET user-service /users/1
+  │     └── user-service responde 200
+  │
+  └── POST reservation-service /reservations
+        ├── reservation.flow.create
+        ├── reservation.validate.room
+        │     └── GET room-service /rooms/1
+        │           └── SELECT rooms WHERE id = 1
+        │
+        └── reservation.check.availability
+              └── SELECT COUNT(*) FROM reservations
+                    → detecta conflicto
+                    → reservation.conflict
+                    → HTTPException 409
+```
 
-La inicialización común está en [`services/common/otel.py`](/home/avr12s/repos/reservas/services/common/otel.py#L1) mediante `setup_telemetry(service_name)`.
+## Instrumentación y nomenclatura
 
-Ese bootstrap configura:
+La inicialización común está en `services/common/otel.py` con `setup_telemetry(service_name)`.
 
-- `TracerProvider` con `BatchSpanProcessor` y `OTLPSpanExporter`
-- `MeterProvider` con `PeriodicExportingMetricReader` y `OTLPMetricExporter`
-- `LoggerProvider` con `BatchLogRecordProcessor` y `OTLPLogExporter`
-- `resource attributes` comunes:
-  `service.namespace`, `service.name`, `service.version`, `service.instance.id`, `deployment.environment.name`
+Instrumentación automática:
 
-Todos los servicios llaman ya a `setup_telemetry()` en el arranque.
+- FastAPI: spans servidor por endpoint.
+- HTTPX: spans cliente entre microservicios.
+- SQLAlchemy: spans de consultas SQL.
+- Redis: spans de operaciones de mensajería.
 
-### Trazas
+Instrumentación manual de negocio (reservation/notification):
 
-Las trazas combinan auto-instrumentación con algo de instrumentación manual:
+- `reservation.flow.create`
+- `reservation.validate.room`
+- `reservation.check.availability`
+- `reservation.persist.confirmed`
+- `reservation.event.publish`
+- `notification.consume.reservation_created`
 
-- FastAPI:
-  genera spans de servidor para cada request HTTP
-- HTTPX:
-  genera spans cliente cuando el gateway invoca otros servicios
-- SQLAlchemy:
-  genera spans de base de datos en `room-service` y `reservation-service`
-- Redis:
-  instrumenta las llamadas al cliente Redis
-- spans manuales:
-  añaden semántica de negocio como `reservation.create`, `reservation.publish_notification` y `notification.process`
+Todos los spans de negocio usan atributos `app_*` para evitar conflictos de mapping en OpenSearch.
 
-Los spans manuales usan atributos `app_*` para evitar conflictos con mappings internos de Trace Analytics.
+## Levantar el entorno
 
-### Propagación de contexto entre servicios
+```bash
+docker compose up -d --build
+```
 
-La correlación HTTP queda resuelta por la instrumentación de FastAPI/HTTPX. El punto importante añadido en esta integración es la propagación por Redis Streams entre `reservation-service` y `notification-service`.
+Solo observabilidad:
 
-Flujo actual:
+```bash
+docker compose up -d --force-recreate opensearch opensearch-dashboards data-prepper otel-collector
+```
 
-1. `reservation-service` crea la reserva.
-2. Antes de publicar el evento en Redis, inyecta el contexto activo de OpenTelemetry en `event["trace"]`.
-3. `notification-service` lee el evento, extrae ese contexto y crea un span consumidor.
-4. OpenSearch puede reconstruir la relación completa entre ambos servicios y mostrarla en Trace Analytics y en el service map.
+## Smoke test E2E
 
-Esto es lo que hace posible ver en OpenSearch la conexión directa entre `reservation-service` y `notification-service`.
+Script: `scripts/test-services.sh`
 
-### Logs
+Qué valida:
 
-El helper [`services/common/logger.py`](/home/avr12s/repos/reservas/services/common/logger.py#L1) hace dos cosas a la vez:
+1. Healthchecks de servicios.
+2. Flujo funcional por `api-gateway`.
+3. Búsqueda automática de franja libre (idempotente).
+4. Reserva exitosa (`200`).
+5. Reintento duplicado (`409`).
 
-- escribe JSON estructurado por `stdout`
-- emite el mismo evento al `LoggerProvider` de OpenTelemetry para exportarlo por OTLP
+Uso:
 
-Cada log incluye, cuando existe un span activo:
+```bash
+bash scripts/test-services.sh
+```
 
-- `trace_id`
-- `span_id`
-- `service`
-- `level`
-- `message`
+Parámetros útiles:
 
-Con esto los logs quedan correlables con las trazas tanto por contexto OTel como por campos explícitos en el payload JSON.
+```bash
+TEST_DAY=2026-05-04 bash scripts/test-services.sh
+BASE_URL_GATEWAY=http://localhost:8080 bash scripts/test-services.sh
+```
 
-Los logs se indexan en:
+## Tests unitarios (servicios Python)
 
-- `logs-otel-*`
+Se incluye una suite de unit tests en `services/tests/` con cobertura de:
 
-### Métricas
+- `api-gateway`
+- `room-service`
+- `user-service`
+- `reservation-service`
+- `notification-service`
 
-La POC añade métricas de negocio y de procesamiento para enriquecer Observability.
+Instalación de dependencias de test:
 
-En `reservation-service`:
+```bash
+python3 -m pip install -r services/common/requirements.txt -r services/requirements-dev.txt
+```
 
-- `reservations.created`
-- `reservations.conflict`
-- `reservations.availability.check`
-- `reservations.duration.seconds`
+Ejecución:
 
-En `notification-service`:
+```bash
+pytest -q services/tests
+```
 
-- `notifications.sent`
-- `notifications.failed`
-- `notifications.processing.latency.ms`
+Notas:
 
-Las métricas se exportan por OTLP y Data Prepper las escribe en:
+- Los tests mockean telemetría e instrumentadores para evitar exportaciones reales.
+- Las dependencias externas (DB/Redis/HTTP entre servicios) se sustituyen por dobles de prueba.
 
-- `metrics-otel-*`
+## Qué comprobar en Dashboards
 
-### Índices resultantes en OpenSearch
+En Trace Analytics, tras ejecutar el smoke test:
 
-Después de generar tráfico, deberías ver al menos estos índices:
+- Traza `POST /reservations` con `200` que incluya `notification.consume.reservation_created`.
+- Traza `POST /reservations` con `409` que incluya `reservation.conflict` y no publique evento.
 
-- `otel-v1-apm-span-*`
-- `otel-v1-apm-service-map*`
-- `logs-otel-*`
-- `metrics-otel-*`
+En índices:
 
-Conceptualmente:
+- Trazas: `otel-v1-apm-span-*`
+- Service map: `otel-v1-apm-service-map*`
+- Logs: `logs-otel-*`
+- Métricas: `metrics-otel-*`
 
-- `otel-v1-apm-span-*`:
-  spans enriquecidos para Trace Analytics
-- `otel-v1-apm-service-map*`:
-  dependencias entre servicios
-- `logs-otel-*`:
-  logs estructurados exportados por OTLP
-- `metrics-otel-*`:
-  métricas OTEL derivadas de los servicios
+## Endpoints principales
 
-### Qué validar en Dashboards
+- API Gateway: `http://localhost:8080`
+- Room Service: `http://localhost:8081`
+- User Service: `http://localhost:8082`
+- Reservation Service: `http://localhost:8083`
+- Notification Service: `http://localhost:8084`
+- OTel Collector HTTP: `http://localhost:4318`
+- OTel Collector gRPC: `localhost:4317`
+- Data Prepper OTLP gRPC: `localhost:21890`
+- Data Prepper API: `http://localhost:4900`
+- OpenSearch: `http://localhost:9200`
+- OpenSearch Dashboards: `http://localhost:5601`
 
-Después de levantar el entorno y ejecutar tráfico con [`scripts/test-services.sh`](/home/avr12s/repos/reservas/scripts/test-services.sh), puedes validar:
+## Documentación interna de servicios
 
-- En Trace Analytics:
-  spans de `room-service`, `user-service`, `reservation-service` y `notification-service`
-- En Service Map:
-  relación `api-gateway -> reservation-service`
-  relación `reservation-service -> notification-service`
-- En Discover:
-  documentos en `logs-otel-*`
-- En índices o visualizaciones:
-  documentos en `metrics-otel-*`
+- Detalle del código Python de prueba, responsabilidades por servicio e instrumentación:
+  [`services/README.md`](/home/avr12s/repos/reservas/services/README.md)
 
-### Variables de entorno OTLP
+## Notas operativas
 
-En Compose cada servicio usa endpoints separados por señal:
+- Si cambias estructura de spans/atributos y aparecen errores de parseo por mapping en trazas, recrea volumen/índices:
 
-- `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://data-prepper:21890/v1/traces`
-- `OTEL_EXPORTER_OTLP_LOGS_ENDPOINT=http://data-prepper:21893/v1/logs`
-- `OTEL_EXPORTER_OTLP_METRICS_ENDPOINT=http://data-prepper:21893/v1/metrics`
-
-Esto permite mantener trazas en el pipeline específico de Trace Analytics y logs/métricas en el pipeline OTLP unificado.
-
-### Ficheros clave
-
-- Bootstrap OTel:
-  [`services/common/otel.py`](/home/avr12s/repos/reservas/services/common/otel.py#L1)
-- Logger estructurado y correlado:
-  [`services/common/logger.py`](/home/avr12s/repos/reservas/services/common/logger.py#L1)
-- Pipeline Data Prepper:
-  [`observability/data-prepper/pipelines/traces-pipeline.yaml`](/home/avr12s/repos/reservas/observability/data-prepper/pipelines/traces-pipeline.yaml#L1)
-- Servicios instrumentados:
-  [`services/reservation-service/main.py`](/home/avr12s/repos/reservas/services/reservation-service/main.py#L1)
-  [`services/notification-service/main.py`](/home/avr12s/repos/reservas/services/notification-service/main.py#L1)
-  [`services/api-gateway/main.py`](/home/avr12s/repos/reservas/services/api-gateway/main.py#L1)
-
+```bash
+docker compose down -v
+docker compose up -d --build
 ```

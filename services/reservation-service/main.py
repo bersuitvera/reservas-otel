@@ -1,5 +1,6 @@
 import os, time, json
 from datetime import datetime
+import httpx
 from fastapi import FastAPI, HTTPException
 from sqlalchemy import create_engine, text
 from sqlalchemy.engine import Engine
@@ -8,6 +9,7 @@ from common.otel import setup_telemetry
 from common.logger import log
 from opentelemetry import metrics, trace
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
 from opentelemetry.instrumentation.sqlalchemy import SQLAlchemyInstrumentor
 from opentelemetry.instrumentation.redis import RedisInstrumentor
 from opentelemetry.propagate import inject
@@ -19,8 +21,11 @@ tracer = trace.get_tracer(SERVICE)
 meter = metrics.get_meter(SERVICE)
 
 DATABASE_URL = os.getenv("DATABASE_URL")
+ROOM_SERVICE_URL = os.getenv("ROOM_SERVICE_URL", "http://room-service:8000")
 engine: Engine = create_engine(DATABASE_URL, pool_pre_ping=True)
 SQLAlchemyInstrumentor().instrument(engine=engine)
+HTTPXClientInstrumentor().instrument()
+http_client = httpx.Client(timeout=3.0)
 
 redis = Redis.from_url(os.getenv("REDIS_URL", "redis://redis:6379/0"))
 RedisInstrumentor().instrument()
@@ -38,6 +43,21 @@ FastAPIInstrumentor.instrument_app(app)
 def parse_ts(s: str) -> datetime:
     # ISO 8601 expected: "2026-03-05T10:00:00"
     return datetime.fromisoformat(s)
+
+def ensure_room_exists(room_id: int) -> None:
+    with tracer.start_as_current_span("reservation.validate.room", kind=SpanKind.INTERNAL) as span:
+        span.set_attribute("app_room_id", room_id)
+        url = f"{ROOM_SERVICE_URL}/rooms/{room_id}"
+        try:
+            resp = http_client.get(url)
+        except httpx.HTTPError:
+            raise HTTPException(503, "room service unavailable")
+
+        if resp.status_code == 404:
+            raise HTTPException(400, "room not found")
+
+        if resp.status_code >= 400:
+            raise HTTPException(503, "room validation failed")
 
 @app.on_event("startup")
 def startup():
@@ -78,52 +98,55 @@ def create(payload: dict):
         raise HTTPException(400, "end must be after start")
 
     duration_seconds = (e - s).total_seconds()
-    with tracer.start_as_current_span("reservation.create", kind=SpanKind.INTERNAL) as span:
+    with tracer.start_as_current_span("reservation.flow.create", kind=SpanKind.INTERNAL) as span:
         span.set_attribute("app_room_id", room_id)
         span.set_attribute("app_user_id", user_id)
         span.set_attribute("app_duration_seconds", duration_seconds)
+        ensure_room_exists(room_id)
 
         if DB_LAT_MS:
             time.sleep(DB_LAT_MS / 1000)
 
-        with engine.begin() as conn:
-            overlap = conn.execute(text("""
-              SELECT COUNT(*) FROM reservations
-              WHERE room_id = :room_id
-                AND status = 'CONFIRMED'
-                AND (start_ts < :end_ts) AND (end_ts > :start_ts)
-            """), {"room_id": room_id, "start_ts": s, "end_ts": e}).scalar_one()
+        with tracer.start_as_current_span("reservation.check.availability", kind=SpanKind.INTERNAL):
+            with engine.begin() as conn:
+                overlap = conn.execute(text("""
+                  SELECT COUNT(*) FROM reservations
+                  WHERE room_id = :room_id
+                    AND status = 'CONFIRMED'
+                    AND (start_ts < :end_ts) AND (end_ts > :start_ts)
+                """), {"room_id": room_id, "start_ts": s, "end_ts": e}).scalar_one()
 
-            if overlap > 0:
-                reservation_conflict_counter.add(1, {"room_id": room_id})
-                span.add_event("reservation.conflict", {"app_room_id": room_id})
-                log("warn", "reservation conflict", room_id=room_id, user_id=user_id)
-                raise HTTPException(409, "time slot not available")
+                if overlap > 0:
+                    reservation_conflict_counter.add(1, {"room_id": room_id})
+                    span.add_event("reservation.conflict", {"app_room_id": room_id})
+                    log("warn", "reservation conflict", room_id=room_id, user_id=user_id)
+                    raise HTTPException(409, "time slot not available")
 
-            rid = conn.execute(text("""
-              INSERT INTO reservations(room_id, user_id, start_ts, end_ts)
-              VALUES (:room_id, :user_id, :start_ts, :end_ts)
-              RETURNING id
-            """), {"room_id": room_id, "user_id": user_id, "start_ts": s, "end_ts": e}).scalar_one()
+                with tracer.start_as_current_span("reservation.persist.confirmed", kind=SpanKind.INTERNAL):
+                    rid = conn.execute(text("""
+                      INSERT INTO reservations(room_id, user_id, start_ts, end_ts)
+                      VALUES (:room_id, :user_id, :start_ts, :end_ts)
+                      RETURNING id
+                    """), {"room_id": room_id, "user_id": user_id, "start_ts": s, "end_ts": e}).scalar_one()
 
         reservation_created_counter.add(1, {"room_id": room_id})
         reservation_duration_histogram.record(duration_seconds, {"room_id": room_id})
 
-        propagation_headers: dict[str, str] = {}
-        inject(propagation_headers)
-        event = {
-            "type": "reservation.created",
-            "reservation_id": rid,
-            "room_id": room_id,
-            "user_id": user_id,
-            "trace": propagation_headers,
-        }
-
-        with tracer.start_as_current_span("reservation.publish_notification", kind=SpanKind.PRODUCER) as publish_span:
+        with tracer.start_as_current_span("reservation.event.publish", kind=SpanKind.PRODUCER) as publish_span:
+            propagation_headers: dict[str, str] = {}
+            inject(propagation_headers)
+            event = {
+                "type": "reservation.created",
+                "reservation_id": rid,
+                "room_id": room_id,
+                "user_id": user_id,
+                "trace": propagation_headers,
+            }
             publish_span.set_attribute("app_messaging_system", "redis")
             publish_span.set_attribute("app_messaging_destination", "events")
             publish_span.set_attribute("app_messaging_operation", "publish")
             publish_span.set_attribute("app_reservation_id", rid)
+            publish_span.set_attribute("app_propagated_traceparent", propagation_headers.get("traceparent", ""))
             redis.xadd("events", {"event": json.dumps(event)})
 
     return {"id": rid, "status": "CONFIRMED"}

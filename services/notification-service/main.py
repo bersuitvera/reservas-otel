@@ -42,9 +42,10 @@ def worker():
                     event_json = event_json.decode()
                 event = json.loads(event_json)
                 context = extract(event.get("trace", {}))
+                event_type = str(event.get("type", "unknown")).replace(".", "_")
 
                 with tracer.start_as_current_span(
-                    "notification.process",
+                    f"notification.consume.{event_type}",
                     context=context,
                     kind=SpanKind.CONSUMER,
                 ) as span:
@@ -53,6 +54,7 @@ def worker():
                     span.set_attribute("app_messaging_operation", "process")
                     span.set_attribute("app_event_type", event.get("type", "unknown"))
                     span.set_attribute("app_reservation_id", event.get("reservation_id", 0))
+                    span.set_attribute("app_received_traceparent", str(event.get("trace", {}).get("traceparent", "")))
 
                     start_time = time.perf_counter()
                     time.sleep(LAT_MS / 1000)

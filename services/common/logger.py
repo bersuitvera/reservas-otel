@@ -6,10 +6,9 @@ import time
 from typing import Any, Dict
 from opentelemetry.trace import get_current_span
 
-SERVICE = os.getenv("SERVICE_NAME", "unknown")
-APP_LOGGER = logging.getLogger(SERVICE)
-
 def log(level: str, msg: str, **fields: Any) -> None:
+    service = os.getenv("SERVICE_NAME", "unknown")
+    app_logger = logging.getLogger(service)
     span = get_current_span()
     ctx = span.get_span_context() if span else None
     trace_id = f"{ctx.trace_id:032x}" if ctx and ctx.trace_id else None
@@ -18,7 +17,7 @@ def log(level: str, msg: str, **fields: Any) -> None:
     payload: Dict[str, Any] = {
         "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
         "level": level,
-        "service": SERVICE,
+        "service": service,
         "message": msg,
         "trace_id": trace_id,
         "span_id": span_id,
@@ -28,7 +27,7 @@ def log(level: str, msg: str, **fields: Any) -> None:
     line = json.dumps(payload, ensure_ascii=False)
     print(line, file=sys.stdout, flush=True)
 
-    APP_LOGGER.log(_to_level(level), msg, extra=_sanitize_fields(fields))
+    app_logger.log(_to_level(level), msg, extra=_sanitize_fields(fields))
 
 
 def _to_level(level: str) -> int:

@@ -22,7 +22,7 @@ services:
       - "6379:6379"
 
   opensearch:
-    image: opensearchproject/opensearch:3.5.0
+    image: opensearchproject/opensearch:3.6.0
     environment:
       discovery.type: single-node
       DISABLE_SECURITY_PLUGIN: "true"
@@ -35,7 +35,7 @@ services:
       - opensearch-data:/usr/share/opensearch/data
 
   opensearch-dashboards:
-    image: opensearchproject/opensearch-dashboards:3.5.0
+    image: opensearchproject/opensearch-dashboards:3.6.0
     environment:
       OPENSEARCH_HOSTS: '["http://opensearch:9200"]'
       DISABLE_SECURITY_DASHBOARDS_PLUGIN: "true"
@@ -45,16 +45,29 @@ services:
       - opensearch
 
   data-prepper:
-    image: opensearchproject/data-prepper:2.13.0
+    image: opensearchproject/data-prepper:2.15.0
     volumes:
       - ./observability/data-prepper/pipelines/traces-pipeline.yaml:/usr/share/data-prepper/pipelines/pipelines.yaml:ro
+      - ./observability/data-prepper/dlq:/usr/share/data-prepper/dlq
       - ./observability/data-prepper/config/data-prepper-config.yaml:/usr/share/data-prepper/config/data-prepper-config.yaml:ro
     ports:
-      - "21890:21890" # OTLP HTTP receiver for traces
-      - "21893:21893" # OTLP HTTP/gRPC receiver for traces, logs y métricas
+      - "21890:21890" # OTLP gRPC unificado para traces/logs/metrics
       - "4900:4900"   # Data Prepper API
     depends_on:
       - opensearch
+
+  otel-collector:
+    image: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.150.1
+    command: ["--config=/etc/otelcol-contrib/config.yaml"]
+    mem_limit: 512m
+    volumes:
+      - ./observability/otel-collector/config.yaml:/etc/otelcol-contrib/config.yaml:ro
+    ports:
+      - "4317:4317" # OTLP gRPC receiver
+      - "4318:4318" # OTLP HTTP receiver
+    depends_on:
+      data-prepper:
+        condition: service_started
 
   room-service:
     build:
@@ -66,16 +79,15 @@ services:
       SERVICE_NAME: room-service
       DATABASE_URL: postgresql+psycopg://user:password@db:5432/reservas_db
       STARTUP_SEED: "true"
-      LOG_FORWARD_HOST: "fluent-bit" # Opcional si añades fluent-bit
-      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://data-prepper:21890/v1/traces
-      OTEL_EXPORTER_OTLP_LOGS_ENDPOINT: http://data-prepper:21893/v1/logs
-      OTEL_EXPORTER_OTLP_METRICS_ENDPOINT: http://data-prepper:21893/v1/metrics
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://otel-collector:4318/v1/traces
+      OTEL_EXPORTER_OTLP_LOGS_ENDPOINT: http://otel-collector:4318/v1/logs
+      OTEL_EXPORTER_OTLP_METRICS_ENDPOINT: http://otel-collector:4318/v1/metrics
     ports:
       - "8081:8000"
     depends_on:
       db:
         condition: service_healthy
-      data-prepper:
+      otel-collector:
         condition: service_started
 
   user-service:
@@ -86,13 +98,13 @@ services:
         SERVICE_NAME: user-service
     environment:
       SERVICE_NAME: user-service
-      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://data-prepper:21890/v1/traces
-      OTEL_EXPORTER_OTLP_LOGS_ENDPOINT: http://data-prepper:21893/v1/logs
-      OTEL_EXPORTER_OTLP_METRICS_ENDPOINT: http://data-prepper:21893/v1/metrics
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://otel-collector:4318/v1/traces
+      OTEL_EXPORTER_OTLP_LOGS_ENDPOINT: http://otel-collector:4318/v1/logs
+      OTEL_EXPORTER_OTLP_METRICS_ENDPOINT: http://otel-collector:4318/v1/metrics
     ports:
       - "8082:8000"
     depends_on:
-      data-prepper:
+      otel-collector:
         condition: service_started
 
   reservation-service:
@@ -105,9 +117,10 @@ services:
       SERVICE_NAME: reservation-service
       DATABASE_URL: postgresql+psycopg://user:password@db:5432/reservas_db
       REDIS_URL: redis://redis:6379/0
-      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://data-prepper:21890/v1/traces
-      OTEL_EXPORTER_OTLP_LOGS_ENDPOINT: http://data-prepper:21893/v1/logs
-      OTEL_EXPORTER_OTLP_METRICS_ENDPOINT: http://data-prepper:21893/v1/metrics
+      ROOM_SERVICE_URL: http://room-service:8000
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://otel-collector:4318/v1/traces
+      OTEL_EXPORTER_OTLP_LOGS_ENDPOINT: http://otel-collector:4318/v1/logs
+      OTEL_EXPORTER_OTLP_METRICS_ENDPOINT: http://otel-collector:4318/v1/metrics
     ports:
       - "8083:8000"
     depends_on:
@@ -115,7 +128,7 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
-      data-prepper:
+      otel-collector:
         condition: service_started
 
   notification-service:
@@ -127,15 +140,15 @@ services:
     environment:
       SERVICE_NAME: notification-service
       REDIS_URL: redis://redis:6379/0
-      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://data-prepper:21890/v1/traces
-      OTEL_EXPORTER_OTLP_LOGS_ENDPOINT: http://data-prepper:21893/v1/logs
-      OTEL_EXPORTER_OTLP_METRICS_ENDPOINT: http://data-prepper:21893/v1/metrics
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://otel-collector:4318/v1/traces
+      OTEL_EXPORTER_OTLP_LOGS_ENDPOINT: http://otel-collector:4318/v1/logs
+      OTEL_EXPORTER_OTLP_METRICS_ENDPOINT: http://otel-collector:4318/v1/metrics
     ports:
       - "8084:8000"
     depends_on:
       redis:
         condition: service_started
-      data-prepper:
+      otel-collector:
         condition: service_started
 
   api-gateway:
@@ -149,15 +162,15 @@ services:
       ROOM_SERVICE_URL: http://room-service:8000
       RESERVATION_SERVICE_URL: http://reservation-service:8000
       USER_SERVICE_URL: http://user-service:8000
-      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://data-prepper:21890/v1/traces
-      OTEL_EXPORTER_OTLP_LOGS_ENDPOINT: http://data-prepper:21893/v1/logs
-      OTEL_EXPORTER_OTLP_METRICS_ENDPOINT: http://data-prepper:21893/v1/metrics
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://otel-collector:4318/v1/traces
+      OTEL_EXPORTER_OTLP_LOGS_ENDPOINT: http://otel-collector:4318/v1/logs
+      OTEL_EXPORTER_OTLP_METRICS_ENDPOINT: http://otel-collector:4318/v1/metrics
     ports:
       - "8080:8000"
     depends_on:
       - room-service
       - reservation-service
-      - data-prepper
+      - otel-collector
 
 # Comandos útiles:
 # docker-compose up --build

@@ -6,7 +6,9 @@ BASE_URL_ROOM="${BASE_URL_ROOM:-http://localhost:8081}"
 BASE_URL_USER="${BASE_URL_USER:-http://localhost:8082}"
 BASE_URL_RES="${BASE_URL_RES:-http://localhost:8083}"
 BASE_URL_NOTIFICATION="${BASE_URL_NOTIFICATION:-http://localhost:8084}"
-TEST_DAY="${TEST_DAY:-2026-03-24}"
+BASE_URL_GATEWAY="${BASE_URL_GATEWAY:-http://localhost:8080}"
+TEST_DAY="${TEST_DAY:-2026-03-01}"
+ROOM_ID="${ROOM_ID:-1}"
 
 START_TS="${TEST_DAY}T10:00:00"
 END_TS="${TEST_DAY}T11:00:00"
@@ -65,6 +67,35 @@ assert_body_contains() {
   pass "$name contiene $pattern"
 }
 
+find_available_slot() {
+  # Busca una franja libre para que el test sea idempotente aunque ya existan
+  # reservas previas en la base de datos.
+  local room
+  local hour
+  local candidate_start
+  local candidate_end
+  local status
+
+  for room in 1 2 3 4; do
+    for hour in 10 11 12 13 14 15 16 17 18 19 20; do
+      candidate_start="${TEST_DAY}T$(printf '%02d' "$hour"):00:00"
+      candidate_end="${TEST_DAY}T$(printf '%02d' "$((hour + 1))"):00:00"
+      status="$(http_status GET "$BASE_URL_GATEWAY/availability?room_id=$room&start=$candidate_start&end=$candidate_end")"
+      [[ "$status" == "200" ]] || continue
+
+      if grep -q '"available":true' /tmp/reservas_test_body.$$; then
+        ROOM_ID="$room"
+        START_TS="$candidate_start"
+        END_TS="$candidate_end"
+        pass "franja libre encontrada room_id=$ROOM_ID $START_TS -> $END_TS"
+        return 0
+      fi
+    done
+  done
+
+  fail "no se encontró ninguna franja libre para TEST_DAY=$TEST_DAY (rooms 1-4)"
+}
+
 cleanup() {
   rm -f /tmp/reservas_test_body.$$
 }
@@ -90,6 +121,10 @@ status="$(http_status GET "$BASE_URL_NOTIFICATION/health")"
 assert_status "notification-service /health" "200" "$status"
 assert_body_contains "notification-service /health" '"ok":true'
 
+status="$(http_status GET "$BASE_URL_GATEWAY/health")"
+assert_status "api-gateway /health" "200" "$status"
+assert_body_contains "api-gateway /health" '"ok":true'
+
 status="$(http_status GET "$BASE_URL_ROOM/rooms?capacity=6")"
 assert_status "room-service /rooms" "200" "$status"
 assert_body_contains "room-service /rooms" '"rooms"'
@@ -98,21 +133,25 @@ status="$(http_status GET "$BASE_URL_USER/users/1")"
 assert_status "user-service /users/1" "200" "$status"
 assert_body_contains "user-service /users/1" '"id":1'
 
-status="$(http_status GET "$BASE_URL_RES/availability?room_id=1&start=$START_TS&end=$END_TS")"
-assert_status "reservation-service /availability" "200" "$status"
-assert_body_contains "reservation-service /availability" '"available":true'
+find_available_slot
 
-payload="$(printf '{"room_id":1,"user_id":1,"start":"%s","end":"%s"}' "$START_TS" "$END_TS")"
-status="$(http_status POST "$BASE_URL_RES/reservations" "$payload")"
-assert_status "reservation-service POST /reservations" "200" "$status"
-assert_body_contains "reservation-service POST /reservations" '"status":"CONFIRMED"'
+status="$(http_status GET "$BASE_URL_GATEWAY/availability?room_id=$ROOM_ID&start=$START_TS&end=$END_TS")"
+assert_status "api-gateway /availability inicial" "200" "$status"
+assert_body_contains "api-gateway /availability inicial" '"available":true'
 
-status="$(http_status GET "$BASE_URL_RES/availability?room_id=1&start=$START_TS&end=$END_TS")"
-assert_status "reservation-service /availability tras reservar" "200" "$status"
-assert_body_contains "reservation-service /availability tras reservar" '"available":false'
+payload="$(printf '{"room_id":%s,"user_id":1,"start":"%s","end":"%s"}' "$ROOM_ID" "$START_TS" "$END_TS")"
+# Escenario feliz: reserva confirmada (200).
+status="$(http_status POST "$BASE_URL_GATEWAY/reservations" "$payload")"
+assert_status "api-gateway POST /reservations" "200" "$status"
+assert_body_contains "api-gateway POST /reservations" '"status":"CONFIRMED"'
 
-status="$(http_status POST "$BASE_URL_RES/reservations" "$payload")"
-assert_status "reservation-service conflicto duplicado" "409" "$status"
-assert_body_contains "reservation-service conflicto duplicado" 'time slot not available'
+status="$(http_status GET "$BASE_URL_GATEWAY/availability?room_id=$ROOM_ID&start=$START_TS&end=$END_TS")"
+assert_status "api-gateway /availability tras reservar" "200" "$status"
+assert_body_contains "api-gateway /availability tras reservar" '"available":false'
+
+# Escenario de error funcional: duplicado sobre la misma franja (409).
+status="$(http_status POST "$BASE_URL_GATEWAY/reservations" "$payload")"
+assert_status "api-gateway conflicto duplicado" "409" "$status"
+assert_body_contains "api-gateway conflicto duplicado" 'time slot not available'
 
 printf '\nSmoke tests completados correctamente.\n'

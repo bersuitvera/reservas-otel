@@ -26,13 +26,19 @@ def _build_resource(service_name: str) -> Resource:
 
 
 def _configure_application_logger(service_name: str, logger_provider: LoggerProvider) -> None:
+    root_logger = logging.getLogger()
+    if not getattr(root_logger, "_otel_handler_configured", False):
+        root_logger.addHandler(LoggingHandler(level=logging.INFO, logger_provider=logger_provider))
+        root_logger.setLevel(logging.INFO)
+        root_logger._otel_handler_configured = True
+
     app_logger = logging.getLogger(service_name)
     if getattr(app_logger, "_otel_handler_configured", False):
         return
 
     app_logger.addHandler(LoggingHandler(level=logging.INFO, logger_provider=logger_provider))
     app_logger.setLevel(logging.INFO)
-    app_logger.propagate = False
+    app_logger.propagate = True
     app_logger._otel_handler_configured = True
 
 

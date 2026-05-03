@@ -1,0 +1,28 @@
+# Sistema Operativo
+.DS_Store
+Thumbs.db
+
+# Entornos de Desarrollo (IDEs)
+.vscode/
+.idea/
+*.swp
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Entornos Virtuales
+.venv/
+venv/
+env/
+
+# Variables de Entorno
+.env
+.env.*
+
+# Datos locales de Docker / Volumenes
+opensearch-data/

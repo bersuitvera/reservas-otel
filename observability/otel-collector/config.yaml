@@ -1,0 +1,88 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  # Protects the collector process from memory spikes under load.
+  memory_limiter:
+    check_interval: 5s
+    limit_percentage: 80
+    spike_limit_percentage: 25
+
+  # Adds host/system metadata used by OpenSearch dashboards and filtering.
+  resourcedetection:
+    detectors: [env, system]
+    timeout: 2s
+    override: false
+
+  # Normalizes attributes to avoid trace-index mapping conflicts in OpenSearch.
+  transform:
+    error_mode: ignore
+    trace_statements:
+      - context: span
+        statements:
+          # De-dot selected attributes to reduce mapping conflicts downstream.
+          - set(attributes["db_system_name"], attributes["db.system.name"]) where attributes["db.system.name"] != nil
+          - delete_key(attributes, "db.system.name")
+          - set(attributes["code_function_name"], attributes["code.function.name"]) where attributes["code.function.name"] != nil
+          - delete_key(attributes, "code.function.name")
+          - set(attributes["user_agent_original"], attributes["user_agent.original"]) where attributes["user_agent.original"] != nil
+          - delete_key(attributes, "user_agent.original")
+          - set(attributes["upstream_cluster_name"], attributes["upstream_cluster.name"]) where attributes["upstream_cluster.name"] != nil
+          - delete_key(attributes, "upstream_cluster.name")
+          - set(attributes["error_type"], attributes["error.type"]) where attributes["error.type"] != nil
+          - delete_key(attributes, "error.type")
+          - set(attributes["app_ads_contextKeys"], attributes["app.ads.contextKeys"]) where attributes["app.ads.contextKeys"] != nil
+          - delete_key(attributes, "app.ads.contextKeys")
+          - set(attributes["rpc_system"], attributes["rpc.system"]) where attributes["rpc.system"] != nil
+          - delete_key(attributes, "rpc.system")
+          # Rename flat-string attributes that can conflict with dotted-object mappings.
+          - set(attributes["user_agent_string"], attributes["user_agent"]) where attributes["user_agent"] != nil and not IsMap(attributes["user_agent"])
+          - delete_key(attributes, "user_agent") where attributes["user_agent_string"] != nil
+          - set(attributes["db_system"], attributes["db.system"]) where attributes["db.system"] != nil
+          - delete_key(attributes, "db.system")
+      - context: spanevent
+        statements:
+          - set(attributes["message_type"], attributes["message.type"]) where attributes["message.type"] != nil
+          - delete_key(attributes, "message.type")
+          - set(attributes["message_id"], attributes["message.id"]) where attributes["message.id"] != nil
+          - delete_key(attributes, "message.id")
+          - set(attributes["message_uncompressed_size"], attributes["message.uncompressed_size"]) where attributes["message.uncompressed_size"] != nil
+          - delete_key(attributes, "message.uncompressed_size")
+    log_statements:
+      - context: log
+        statements:
+          # Flatten structured bodies to keep log ingestion stable.
+          - flatten(body) where IsMap(body)
+          - set(body, ToKeyValueString(body)) where IsMap(body)
+
+  # Batches records before export to improve throughput.
+  batch:
+    timeout: 1s
+    send_batch_size: 1024
+
+exporters:
+  # Single OTLP gRPC export target: Data Prepper unified entrypoint.
+  otlp_grpc/data-prepper:
+    endpoint: data-prepper:21890
+    tls:
+      insecure: true
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [resourcedetection, memory_limiter, transform, batch]
+      exporters: [otlp_grpc/data-prepper]
+    logs:
+      receivers: [otlp]
+      processors: [resourcedetection, memory_limiter, transform, batch]
+      exporters: [otlp_grpc/data-prepper]
+    metrics:
+      receivers: [otlp]
+      processors: [resourcedetection, memory_limiter, batch]
+      exporters: [otlp_grpc/data-prepper]

@@ -1,5 +1,5 @@
 import os
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy import create_engine, text
 from sqlalchemy.engine import Engine
 from common.otel import setup_telemetry
@@ -67,6 +67,17 @@ def list_rooms(date: str | None = None, capacity: int | None = None, engine: Eng
     with engine.begin() as conn:
         rows = conn.execute(text(q), params).mappings().all()
     return {"rooms": list(rows)}
+
+@app.get("/rooms/{room_id}")
+def get_room(room_id: int, engine: Engine = Depends(get_engine)):
+    with engine.begin() as conn:
+        row = conn.execute(
+            text("SELECT id, name, capacity, equipment FROM rooms WHERE id = :id"),
+            {"id": room_id},
+        ).mappings().first()
+    if not row:
+        raise HTTPException(404, "room not found")
+    return dict(row)
 
 @app.get("/health")
 def health():
