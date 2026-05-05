@@ -135,3 +135,6 @@ metrics-pipeline:
         index_type: metric-analytics-plain
         max_retries: 5
         dlq_file: /usr/share/data-prepper/dlq/metrics.dlq
+        index: ss4o_metrics-otel-%{yyyy.MM.dd}
+        bulk_size: 4
+

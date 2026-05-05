@@ -20,7 +20,7 @@ Proyecto de ejemplo con microservicios en Python/FastAPI para gestión de salas,
 | PostgreSQL | `5432` | Persistencia de salas y reservas. |
 | Redis | `6379` | Bus de eventos para notificaciones. |
 
-## Versiones fijadas
+## Versiones
 
 - OpenSearch: `3.6.0`
 - OpenSearch Dashboards: `3.6.0`
@@ -29,7 +29,7 @@ Proyecto de ejemplo con microservicios en Python/FastAPI para gestión de salas,
 - PostgreSQL: `16-alpine`
 - Redis: `7-alpine`
 
-## Arquitectura definitiva
+## Arquitectura 
 
 ```text
 [Microservicios FastAPI]

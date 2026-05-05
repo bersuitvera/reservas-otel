@@ -24,7 +24,7 @@ api-gateway
               └── notification-service (XREAD events)
 ```
 
-## Modelo de datos rápido
+## Modelo de datos 
 
 ### PostgreSQL
 
@@ -264,7 +264,7 @@ api-gateway
 
 ## Unit tests
 
-La suite unitaria está en `services/tests/` y cubre endpoints y lógica de negocio de todos los servicios.
+Los test  están en `services/tests/` y cubren endpoints y lógica de negocio de todos los servicios.
 
 Instalar dependencias:
 
@@ -278,8 +278,3 @@ Ejecutar tests:
 pytest -q tests
 ```
 
-Desde la raíz del repositorio, el comando equivalente es:
-
-```bash
-pytest -q services/tests
-```
