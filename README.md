@@ -13,10 +13,13 @@ Proyecto de ejemplo con microservicios en Python/FastAPI para gestión de salas,
 | Notification Service | `8084` | Consumidor de eventos desde Redis Streams. |
 | OpenSearch API | `9200` | Almacenamiento y consulta de telemetría. |
 | OpenSearch Dashboards | `5601` | Visualización de trazas, logs y métricas. |
-| Data Prepper OTLP gRPC | `21890` | Entrada OTLP unificada (traces/logs/metrics). |
+| Prometheus | `9090` | Almacenamiento de métricas OTLP + RED metrics de APM v2. |
+| OpenSearch Exporter | `9114` | Métricas de OpenSearch para scraping en Prometheus. |
+| Data Prepper OTLP gRPC | `21890` | Entrada OTLP para trazas/logs desde OTel Collector. |
 | Data Prepper API | `4900` | Estado operativo de pipelines. |
 | OTel Collector OTLP gRPC | `4317` | Receiver OTLP gRPC desde servicios. |
 | OTel Collector OTLP HTTP | `4318` | Receiver OTLP HTTP desde servicios. |
+| OTel Collector Metrics | `8888` | Métricas internas del collector (Prometheus scrape). |
 | PostgreSQL | `5432` | Persistencia de salas y reservas. |
 | Redis | `6379` | Bus de eventos para notificaciones. |
 
@@ -26,6 +29,8 @@ Proyecto de ejemplo con microservicios en Python/FastAPI para gestión de salas,
 - OpenSearch Dashboards: `3.6.0`
 - Data Prepper: `2.15.0`
 - OTel Collector Contrib: `0.150.1`
+- Prometheus: `v3.8.1`
+- OpenSearch Exporter: `v1.10.0`
 - PostgreSQL: `16-alpine`
 - Redis: `7-alpine`
 
@@ -34,22 +39,21 @@ Proyecto de ejemplo con microservicios en Python/FastAPI para gestión de salas,
 ```text
 [Microservicios FastAPI]
     |
-    | OTLP HTTP (4318)
+    | OTLP HTTP/gRPC (4318/4317)
     v
 [OTel Collector]
-    |
-    | OTLP gRPC (21890)
-    v
-[Data Prepper entry-pipeline]
-    |---- route TRACE  -> traces-raw-pipeline + service-map-pipeline
-    |---- route LOG    -> logs-pipeline
-    \---- route METRIC -> metrics-pipeline
-                     |
-                     v
-               [OpenSearch]
-                     |
-                     v
-          [OpenSearch Dashboards]
+    |---- TRACE/LOG -> OTLP gRPC (21890) -> Data Prepper
+    \---- METRIC    -> OTLP HTTP (/api/v1/otlp) -> Prometheus
+                                            ^
+                                            |
+                         APM v2 RED metrics from Data Prepper (remote_write)
+
+Data Prepper:
+  - traces-raw-pipeline -> OpenSearch (spans)
+  - service-map-pipeline (otel_apm_service_map) -> OpenSearch + Prometheus
+  - logs-pipeline -> OpenSearch
+
+OpenSearch -> OpenSearch Dashboards
 ```
 
 ## Modelo de datos (PostgreSQL + eventos)
@@ -193,7 +197,7 @@ docker compose up -d --build
 Solo observabilidad:
 
 ```bash
-docker compose up -d --force-recreate opensearch opensearch-dashboards data-prepper otel-collector
+docker compose up -d --force-recreate opensearch opensearch-dashboards data-prepper otel-collector prometheus opensearch-exporter
 ```
 
 ## Smoke test E2E
@@ -258,9 +262,9 @@ En Trace Analytics, tras ejecutar el smoke test:
 En índices:
 
 - Trazas: `otel-v1-apm-span-*`
-- Service map: `otel-v1-apm-service-map*`
+- Service map (APM v2): `otel-v2-apm-service-map*`
 - Logs: `logs-otel-*`
-- Métricas: `metrics-otel-*`
+- Métricas: en Prometheus (UI y PromQL en `http://localhost:9090`)
 
 ## Endpoints principales
 
@@ -273,6 +277,9 @@ En índices:
 - OTel Collector gRPC: `localhost:4317`
 - Data Prepper OTLP gRPC: `localhost:21890`
 - Data Prepper API: `http://localhost:4900`
+- Prometheus: `http://localhost:9090`
+- OpenSearch Exporter metrics: `http://localhost:9114/metrics`
+- OTel Collector internal metrics: `http://localhost:8888/metrics`
 - OpenSearch: `http://localhost:9200`
 - OpenSearch Dashboards: `http://localhost:5601`
 

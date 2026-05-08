@@ -1,5 +1,6 @@
 volumes:
   opensearch-data:
+  prometheus-data:
 
 services:
   db:
@@ -51,8 +52,38 @@ services:
       - ./observability/data-prepper/dlq:/usr/share/data-prepper/dlq
       - ./observability/data-prepper/config/data-prepper-config.yaml:/usr/share/data-prepper/config/data-prepper-config.yaml:ro
     ports:
-      - "21890:21890" # OTLP gRPC unificado para traces/logs/metrics
+      - "21890:21890" # OTLP gRPC para traces/logs desde OTel Collector
       - "4900:4900"   # Data Prepper API
+    depends_on:
+      - opensearch
+      - prometheus
+
+  prometheus:
+    image: prom/prometheus:v3.8.1
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time=15d"
+      - "--web.enable-remote-write-receiver"
+      - "--web.enable-lifecycle"
+      - "--web.route-prefix=/"
+      - "--enable-feature=exemplar-storage"
+      - "--web.enable-otlp-receiver"
+    volumes:
+      - ./observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    ports:
+      - "9090:9090"
+
+  opensearch-exporter:
+    image: prometheuscommunity/elasticsearch-exporter:v1.10.0
+    command:
+      - "--es.uri=http://opensearch:9200"
+      - "--es.all"
+      - "--es.indices"
+      - "--es.shards"
+    ports:
+      - "9114:9114"
     depends_on:
       - opensearch
 
@@ -65,8 +96,11 @@ services:
     ports:
       - "4317:4317" # OTLP gRPC receiver
       - "4318:4318" # OTLP HTTP receiver
+      - "8888:8888" # Métricas internas del collector para scrape
     depends_on:
       data-prepper:
+        condition: service_started
+      prometheus:
         condition: service_started
 
   room-service:
@@ -180,3 +214,4 @@ services:
 # Acceso Notification Service: http://localhost:8084/health
 # OpenSearch Dashboards: http://localhost:5601
 # Data Prepper API: http://localhost:4900
+# Prometheus: http://localhost:9090
