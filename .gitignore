@@ -1,28 +1,50 @@
-# Sistema Operativo
+# OS files
 .DS_Store
 Thumbs.db
 
-# Entornos de Desarrollo (IDEs)
+# Editor / IDE
 .vscode/
 .idea/
 *.swp
+*.swo
 
-# Python
+# Python bytecode and caches
 __pycache__/
 *.py[cod]
 *$py.class
 .pytest_cache/
-.coverage
-htmlcov/
+.mypy_cache/
+.ruff_cache/
+.pyre/
+.hypothesis/
 
-# Entornos Virtuales
+# Test / coverage artifacts
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+
+# Build / packaging artifacts
+build/
+dist/
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+
+# Virtual environments
 .venv/
 venv/
 env/
+ENV/
 
-# Variables de Entorno
+# Environment variables
 .env
 .env.*
 
-# Datos locales de Docker / Volumenes
+# Jupyter
+.ipynb_checkpoints/
+
+# Local docker volumes/data
 opensearch-data/
+elasticsearch-data/
