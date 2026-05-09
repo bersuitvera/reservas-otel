@@ -1,291 +1,182 @@
-# Sistema de Reservas - Microservicios
+# Sistema de Reservas - Elastic Observability
 
-Proyecto de ejemplo con microservicios en Python/FastAPI para gestión de salas, usuarios, reservas y notificaciones, con trazabilidad distribuida en OpenSearch usando OpenTelemetry Collector y Data Prepper.
+Proyecto de ejemplo con microservicios Python/FastAPI para gestión de salas, usuarios, reservas y notificaciones.
+La observabilidad de la POC está orientada a Elastic APM + Elasticsearch + Kibana + Elastic Agent.
 
-## Servicios
+## Objetivo de esta rama
 
-| Servicio | Puerto local | Descripción |
+Esta rama (`integracion-total-elastic`) prioriza una POC estable y coherente con el stack Elastic:
+
+- Trazas y métricas de aplicación con Elastic APM Python Agent.
+- Logs de aplicación en formato ECS JSON.
+- Ingesta de logs de contenedores y métricas de infraestructura con Elastic Agent (standalone).
+
+## Componentes y puertos
+
+| Componente | Puerto | Uso |
 |---|---:|---|
 | API Gateway | `8080` | Punto de entrada del flujo funcional. |
-| Room Service | `8081` | Inventario de salas y consulta por id/capacidad. |
-| User Service | `8082` | Consulta básica de usuarios. |
+| Room Service | `8081` | Catálogo de salas. |
+| User Service | `8082` | Validación de usuarios. |
 | Reservation Service | `8083` | Disponibilidad y creación de reservas. |
-| Notification Service | `8084` | Consumidor de eventos desde Redis Streams. |
-| OpenSearch API | `9200` | Almacenamiento y consulta de telemetría. |
-| OpenSearch Dashboards | `5601` | Visualización de trazas, logs y métricas. |
-| Data Prepper OTLP gRPC | `21890` | Entrada OTLP unificada (traces/logs/metrics). |
-| Data Prepper API | `4900` | Estado operativo de pipelines. |
-| OTel Collector OTLP gRPC | `4317` | Receiver OTLP gRPC desde servicios. |
-| OTel Collector OTLP HTTP | `4318` | Receiver OTLP HTTP desde servicios. |
-| PostgreSQL | `5432` | Persistencia de salas y reservas. |
-| Redis | `6379` | Bus de eventos para notificaciones. |
+| Notification Service | `8084` | Consumo asíncrono de eventos. |
+| Elasticsearch | `9200` | Almacenamiento de telemetría. |
+| Kibana | `5601` | UI de observabilidad. |
+| APM intake | `8200` | Entrada para agentes APM Python. |
+| PostgreSQL | `5432` | Persistencia funcional. |
+| Redis | `6379` | Bus de eventos. |
 
-## Versiones
+## Arranque rápido
 
-- OpenSearch: `3.6.0`
-- OpenSearch Dashboards: `3.6.0`
-- Data Prepper: `2.15.0`
-- OTel Collector Contrib: `0.150.1`
-- PostgreSQL: `16-alpine`
-- Redis: `7-alpine`
-
-## Arquitectura 
-
-```text
-[Microservicios FastAPI]
-    |
-    | OTLP HTTP (4318)
-    v
-[OTel Collector]
-    |
-    | OTLP gRPC (21890)
-    v
-[Data Prepper entry-pipeline]
-    |---- route TRACE  -> traces-raw-pipeline + service-map-pipeline
-    |---- route LOG    -> logs-pipeline
-    \---- route METRIC -> metrics-pipeline
-                     |
-                     v
-               [OpenSearch]
-                     |
-                     v
-          [OpenSearch Dashboards]
-```
-
-## Modelo de datos (PostgreSQL + eventos)
-
-### Diagrama ER (simplificado)
-
-```text
-rooms
-  id (PK)
-  name
-  capacity
-  equipment
-    ^
-    |
-reservations
-  id (PK)
-  room_id
-  user_id
-  start_ts
-  end_ts
-  status
-```
-
-Nota: en esta POC `room_id` y `user_id` se validan a nivel de aplicación (no hay FK declaradas en SQL).
-
-### Esquema de tablas
-
-Tabla `rooms`:
-
-- `id` `SERIAL` `PRIMARY KEY`
-- `name` `TEXT NOT NULL`
-- `capacity` `INT NOT NULL`
-- `equipment` `TEXT NOT NULL DEFAULT ''`
-
-Tabla `reservations`:
-
-- `id` `SERIAL` `PRIMARY KEY`
-- `room_id` `INT NOT NULL`
-- `user_id` `INT NOT NULL`
-- `start_ts` `TIMESTAMP NOT NULL`
-- `end_ts` `TIMESTAMP NOT NULL`
-- `status` `TEXT NOT NULL DEFAULT 'CONFIRMED'`
-
-### Modelo de evento (Redis Stream `events`)
-
-Evento publicado por `reservation-service`:
-
-```json
-{
-  "type": "reservation.created",
-  "reservation_id": 13,
-  "room_id": 1,
-  "user_id": 1,
-  "trace": {
-    "traceparent": "00-<trace_id>-<span_id>-01"
-  }
-}
-```
-
-## Flujo funcional
-
-1. `api-gateway` valida usuario llamando a `user-service`.
-2. `api-gateway` delega creación en `reservation-service`.
-3. `reservation-service` valida sala contra `room-service`.
-4. `reservation-service` comprueba disponibilidad y persiste reserva.
-5. `reservation-service` publica evento `reservation.created` en Redis.
-6. `notification-service` consume ese evento en la misma traza distribuida.
-
-## Ejemplo de traza correcta (reserva confirmada)
-
-```text
-api-gateway
-  ├── GET user-service /users/1
-  │     └── respuesta 200
-  │
-  └── POST reservation-service /reservations
-        ├── reservation.flow.create
-        ├── reservation.validate.room
-        │     └── GET room-service /rooms/1
-        │           └── SELECT rooms WHERE id = 1
-        │
-        ├── reservation.check.availability
-        │     └── SELECT COUNT(*) FROM reservations
-        │
-        ├── reservation.persist.confirmed
-        │     └── INSERT INTO reservations
-        │
-        └── reservation.event.publish
-              └── Redis XADD events
-                    └── notification-service consume reservation.created
-```
-
-## Ejemplo de traza de error (conflicto 409)
-
-```text
-api-gateway
-  ├── GET user-service /users/1
-  │     └── user-service responde 200
-  │
-  └── POST reservation-service /reservations
-        ├── reservation.flow.create
-        ├── reservation.validate.room
-        │     └── GET room-service /rooms/1
-        │           └── SELECT rooms WHERE id = 1
-        │
-        └── reservation.check.availability
-              └── SELECT COUNT(*) FROM reservations
-                    → detecta conflicto
-                    → reservation.conflict
-                    → HTTPException 409
-```
-
-## Instrumentación y nomenclatura
-
-La inicialización común está en `services/common/otel.py` con `setup_telemetry(service_name)`.
-
-Instrumentación automática:
-
-- FastAPI: spans servidor por endpoint.
-- HTTPX: spans cliente entre microservicios.
-- SQLAlchemy: spans de consultas SQL.
-- Redis: spans de operaciones de mensajería.
-
-Instrumentación manual de negocio (reservation/notification):
-
-- `reservation.flow.create`
-- `reservation.validate.room`
-- `reservation.check.availability`
-- `reservation.persist.confirmed`
-- `reservation.event.publish`
-- `notification.consume.reservation_created`
-
-Todos los spans de negocio usan atributos `app_*` para evitar conflictos de mapping en OpenSearch.
-
-## Levantar el entorno
+1. Levantar stack completo:
 
 ```bash
-docker compose up -d --build
+docker compose -f docker-compose.yml -f docker-compose.elastic.yml up -d --build
 ```
 
-Solo observabilidad:
+2. Parar stack completo:
 
 ```bash
-docker compose up -d --force-recreate opensearch opensearch-dashboards data-prepper otel-collector
+docker compose -f docker-compose.yml -f docker-compose.elastic.yml down --remove-orphans
 ```
 
-## Smoke test E2E
+3. Ver logs del agente:
 
-Script: `scripts/test-services.sh`
+```bash
+docker compose -f docker-compose.yml -f docker-compose.elastic.yml logs -f elastic-agent
+```
 
-Qué valida:
+## Variables importantes
 
-1. Healthchecks de servicios.
-2. Flujo funcional por `api-gateway`.
-3. Búsqueda automática de franja libre (idempotente).
-4. Reserva exitosa (`200`).
-5. Reintento duplicado (`409`).
+Archivo `.env`:
 
-Uso:
+- `KIBANA_SERVICE_TOKEN`: token del service account de Kibana.
+
+Variables que inyecta `docker-compose.elastic.yml` en servicios:
+
+- `ELASTIC_APM_SERVER_URL`
+- `ELASTIC_APM_SERVICE_NAME`
+- `ELASTIC_APM_SERVICE_VERSION`
+- `ELASTIC_APM_ENVIRONMENT`
+- `ELASTIC_APM_ENABLE_LOG_CORRELATION`
+
+Credenciales usadas en la POC local:
+
+- `ELASTIC_PASSWORD` (por defecto `changeme`)
+- `ELASTICSEARCH_USERNAME` (por defecto `elastic`)
+
+## Ficheros de configuración Elastic
+
+### `docker-compose.elastic.yml`
+
+Define los servicios de observabilidad de la POC:
+
+- `elasticsearch` con seguridad habilitada.
+- `kibana` autenticado mediante `ELASTICSEARCH_SERVICEACCOUNTTOKEN`.
+- `apm-server` para intake de agentes APM Python.
+- `elastic-agent` standalone para logs de contenedor y métricas de infraestructura.
+
+Además sobreescribe variables de cada microservicio para activar APM.
+
+### `observability/apm-server/apm-server.yml`
+
+Configura APM Server con:
+
+- `host: 0.0.0.0:8200`
+- salida `output.elasticsearch` hacia `elasticsearch:9200`
+
+Notas de la POC:
+
+- Se mantiene `anonymous.enabled: true` para simplicidad en laboratorio.
+- En productivo conviene token/API key y TLS extremo a extremo.
+
+### `observability/elastic-agent/elastic-agent.yml`
+
+Configura Elastic Agent standalone:
+
+- `outputs.default` contra Elasticsearch.
+- Input `filestream` para logs Docker en `/var/lib/docker/containers/*/*-json.log`.
+- Parser de contenedor y `decode_json_fields` para aprovechar el JSON ECS emitido por la app.
+- Input `system/metrics` para `cpu`, `memory`, `network`, `filesystem`.
+- Input `docker/metrics` para métricas por contenedor (cpu, memory, network, diskio, container).
+
+### `services/common/apm.py`
+
+Bootstrap común por servicio:
+
+- `elasticapm.instrument()` (auto-instrumentación compatible).
+- Middleware `ElasticAPM` para FastAPI/Starlette.
+- Configuración por variables `ELASTIC_APM_*`.
+
+### `services/common/logger.py`
+
+Logging unificado de aplicación:
+
+- `ecs_logging.StdlibFormatter()`.
+- Salida JSON por `stdout`.
+- Campos de servicio y entorno para facilitar consulta/correlación en Kibana.
+
+## Flujo funcional de negocio
+
+1. `api-gateway` valida usuario en `user-service`.
+2. `api-gateway` delega reserva en `reservation-service`.
+3. `reservation-service` valida sala en `room-service`.
+4. Si hay hueco, persiste reserva en PostgreSQL.
+5. Publica evento en Redis stream `events`.
+6. `notification-service` consume y procesa el evento.
+
+## Comprobaciones en Kibana
+
+Después de ejecutar `scripts/test-services.sh`, validar:
+
+- APM > Services: aparecen 5 servicios.
+- APM > Traces: traza `POST /reservations` con casos `200` y `409`.
+- Logs/Discover: entradas con `service.name`, `trace.id` y `span.id`.
+- Data streams esperados:
+  - `traces-apm*`
+  - `metrics-apm*`
+  - `logs-containerlogs-*`
+  - `metrics-system.*`
+  - `metrics-docker.*`
+
+## Decisión de arquitectura en esta POC
+
+Sobre si usar APM gestionado por Fleet: sí es una opción más completa para operación centralizada.
+Para esta POC se mantiene APM Server standalone + Elastic Agent standalone porque:
+
+- reduce complejidad operativa inicial,
+- acelera pruebas funcionales,
+- mantiene la rama estable para comparativas.
+
+Cuando la POC cierre, el siguiente paso natural es migrar a Fleet-managed para políticas centralizadas.
+
+## Tests
+
+### Smoke test E2E
 
 ```bash
 bash scripts/test-services.sh
 ```
 
-Parámetros útiles:
+Opcionales:
 
 ```bash
 TEST_DAY=2026-05-04 bash scripts/test-services.sh
 BASE_URL_GATEWAY=http://localhost:8080 bash scripts/test-services.sh
 ```
 
-## Tests unitarios (servicios Python)
-
-Se incluye una suite de unit tests en `services/tests/` con cobertura de:
-
-- `api-gateway`
-- `room-service`
-- `user-service`
-- `reservation-service`
-- `notification-service`
-
-Instalación de dependencias de test:
+### Unit tests Python
 
 ```bash
 python3 -m pip install -r services/common/requirements.txt -r services/requirements-dev.txt
-```
-
-Ejecución:
-
-```bash
 pytest -q services/tests
 ```
 
-Notas:
+## Troubleshooting rápido
 
-- Los tests mockean telemetría e instrumentadores para evitar exportaciones reales.
-- Las dependencias externas (DB/Redis/HTTP entre servicios) se sustituyen por dobles de prueba.
-
-## Qué comprobar en Dashboards
-
-En Trace Analytics, tras ejecutar el smoke test:
-
-- Traza `POST /reservations` con `200` que incluya `notification.consume.reservation_created`.
-- Traza `POST /reservations` con `409` que incluya `reservation.conflict` y no publique evento.
-
-En índices:
-
-- Trazas: `otel-v1-apm-span-*`
-- Service map: `otel-v1-apm-service-map*`
-- Logs: `logs-otel-*`
-- Métricas: `metrics-otel-*`
-
-## Endpoints principales
-
-- API Gateway: `http://localhost:8080`
-- Room Service: `http://localhost:8081`
-- User Service: `http://localhost:8082`
-- Reservation Service: `http://localhost:8083`
-- Notification Service: `http://localhost:8084`
-- OTel Collector HTTP: `http://localhost:4318`
-- OTel Collector gRPC: `localhost:4317`
-- Data Prepper OTLP gRPC: `localhost:21890`
-- Data Prepper API: `http://localhost:4900`
-- OpenSearch: `http://localhost:9200`
-- OpenSearch Dashboards: `http://localhost:5601`
-
-## Documentación interna de servicios
-
-- Detalle del código Python de prueba, responsabilidades por servicio e instrumentación:
-  [`services/README.md`](./services/README.md)
-
-## Notas operativas
-
-- Si cambias estructura de spans/atributos y aparecen errores de parseo por mapping en trazas, recrea volumen/índices:
-
-```bash
-docker compose down -v
-docker compose up -d --build
-```
+- Si `down` no para todo, usar ambos archivos compose y `--remove-orphans`.
+- Si Kibana no arranca, revisar `KIBANA_SERVICE_TOKEN` en `.env`.
+- Si no ves logs, revisar:
+  - `docker compose ... logs elastic-agent`
+  - montaje `/var/lib/docker/containers` en `elastic-agent`
+  - que la app esté emitiendo logs en JSON ECS.

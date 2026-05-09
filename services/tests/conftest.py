@@ -30,11 +30,7 @@ def patch_telemetry(monkeypatch):
     # Evita exportaciones reales y dependencias de infraestructura en unit tests.
     monkeypatch.setenv("DATABASE_URL", "sqlite+pysqlite:///:memory:")
     with ExitStack() as stack:
-        stack.enter_context(patch("common.otel.setup_telemetry"))
-        stack.enter_context(patch("opentelemetry.instrumentation.fastapi.FastAPIInstrumentor.instrument_app"))
-        stack.enter_context(patch("opentelemetry.instrumentation.sqlalchemy.SQLAlchemyInstrumentor.instrument"))
-        stack.enter_context(patch("opentelemetry.instrumentation.httpx.HTTPXClientInstrumentor.instrument"))
-        stack.enter_context(patch("opentelemetry.instrumentation.redis.RedisInstrumentor.instrument"))
+        stack.enter_context(patch("common.apm.setup_apm"))
         yield
 
 

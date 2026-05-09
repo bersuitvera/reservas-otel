@@ -1,13 +1,11 @@
 import os
 from fastapi import FastAPI, HTTPException
-from common.otel import setup_telemetry
-from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+from common.apm import setup_apm
 
 SERVICE = os.getenv("SERVICE_NAME", "user-service")
-setup_telemetry(SERVICE)
 
 app = FastAPI(title="User Service")
-FastAPIInstrumentor.instrument_app(app)
+setup_apm(SERVICE, app)
 
 USERS = {
     1: {"id": 1, "name": "Ana", "email": "ana@example.com"},

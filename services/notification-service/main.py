@@ -1,32 +1,28 @@
-import os, json, random, time, threading
+import json
+import os
+import random
+import threading
+import time
+
+import elasticapm
 from fastapi import FastAPI
 from redis import Redis
-from common.otel import setup_telemetry
+
+from common.apm import setup_apm
 from common.logger import log
-from opentelemetry import metrics, trace
-from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
-from opentelemetry.instrumentation.redis import RedisInstrumentor
-from opentelemetry.propagate import extract
-from opentelemetry.trace import SpanKind
 
 SERVICE = os.getenv("SERVICE_NAME", "notification-service")
-setup_telemetry(SERVICE)
-tracer = trace.get_tracer(SERVICE)
-meter = metrics.get_meter(SERVICE)
 
 redis = Redis.from_url(os.getenv("REDIS_URL", "redis://redis:6379/0"))
-RedisInstrumentor().instrument()
 
 FAIL_RATE = float(os.getenv("FAIL_RATE", "0.10"))
 LAT_MS = int(os.getenv("ARTIFICIAL_LATENCY_MS", "50"))
-notification_sent_counter = meter.create_counter("notifications.sent")
-notification_failed_counter = meter.create_counter("notifications.failed")
-notification_latency_histogram = meter.create_histogram("notifications.processing.latency.ms")
 
 app = FastAPI(title="Notification Service")
-FastAPIInstrumentor.instrument_app(app)
+setup_apm(SERVICE, app)
 
 stop_flag = False
+
 
 def worker():
     last_id = "0-0"
@@ -41,39 +37,47 @@ def worker():
                 if isinstance(event_json, (bytes, bytearray)):
                     event_json = event_json.decode()
                 event = json.loads(event_json)
-                context = extract(event.get("trace", {}))
+
                 event_type = str(event.get("type", "unknown")).replace(".", "_")
+                tx_name = f"notification.consume.{event_type}"
 
-                with tracer.start_as_current_span(
-                    f"notification.consume.{event_type}",
-                    context=context,
-                    kind=SpanKind.CONSUMER,
-                ) as span:
-                    span.set_attribute("app_messaging_system", "redis")
-                    span.set_attribute("app_messaging_destination", "events")
-                    span.set_attribute("app_messaging_operation", "process")
-                    span.set_attribute("app_event_type", event.get("type", "unknown"))
-                    span.set_attribute("app_reservation_id", event.get("reservation_id", 0))
-                    span.set_attribute("app_received_traceparent", str(event.get("trace", {}).get("traceparent", "")))
+                client = elasticapm.get_client()
+                trace_headers = event.get("trace", {})
+                parent = elasticapm.trace_parent_from_headers(trace_headers) if trace_headers else None
+                client.begin_transaction("messaging", trace_parent=parent)
+                elasticapm.set_transaction_name(tx_name)
 
-                    start_time = time.perf_counter()
+                tx_result = "success"
+                with elasticapm.capture_span(
+                    tx_name,
+                    span_type="messaging",
+                    span_subtype="redis",
+                    span_action="process",
+                    labels={
+                        "app_messaging_system": "redis",
+                        "app_messaging_destination": "events",
+                        "app_event_type": event.get("type", "unknown"),
+                        "app_reservation_id": event.get("reservation_id", 0),
+                        "app_received_traceparent": str(trace_headers.get("traceparent", "")),
+                    },
+                ):
                     time.sleep(LAT_MS / 1000)
-                    latency_ms = (time.perf_counter() - start_time) * 1000
-                    notification_latency_histogram.record(latency_ms)
 
                     if random.random() < FAIL_RATE:
-                        notification_failed_counter.add(1)
-                        span.add_event("notification.failed", {"app_error_type": "simulated_503"})
+                        tx_result = "error"
                         log("error", "notification failed", event=event, error_type="simulated_503")
                     else:
-                        notification_sent_counter.add(1)
                         log("info", "notification sent", event=event)
+
+                client.end_transaction(name=tx_name, result=tx_result)
+
 
 @app.on_event("startup")
 def startup():
     t = threading.Thread(target=worker, daemon=True)
     t.start()
     log("info", "notification worker started", fail_rate=FAIL_RATE, latency_ms=LAT_MS)
+
 
 @app.get("/health")
 def health():

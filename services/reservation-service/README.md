@@ -7,7 +7,7 @@ Este microservicio es el núcleo transaccional del sistema. Se encarga de gestio
 1. **Validación de Entidades**: Asegurar que las salas existen consultando al `room-service`.
 2. **Control de Disponibilidad**: Verificar de forma síncrona que no existan solapamientos de horarios para una sala específica (`reservation.check.availability`).
 3. **Persistencia Transaccional**: Almacenar la reserva con estado `CONFIRMED` en PostgreSQL.
-4. **Publicación de Eventos**: Propagar la confirmación mediante Redis Streams (`events`), inyectando el contexto de OpenTelemetry para la trazabilidad distribuida.
+4. **Publicación de Eventos**: Propagar la confirmación mediante Redis Streams (`events`), inyectando `traceparent` para continuidad de trazas en Elastic APM.
 
 ## Endpoints
 
@@ -47,7 +47,7 @@ Tras una reserva exitosa, se publica un mensaje en el stream `events` de Redis.
   }
 }
 ```
-El campo `traceparent` es crucial para que `notification-service` continúe la traza en OpenTelemetry.
+El campo `traceparent` permite que `notification-service` continúe la traza distribuida en el mismo contexto.
 
 ## Instrumentación y Observabilidad
 
@@ -65,12 +65,10 @@ Este servicio utiliza instrumentación intensiva, tanto automática como manual.
 
 - `reservation.conflict`: Añadido al span cuando la consulta de disponibilidad detecta un solapamiento (resultando en un 409).
 
-### Métricas Custom
+### Métricas
 
-- `reservations.created` (Counter)
-- `reservations.conflict` (Counter)
-- `reservations.availability.check` (Counter)
-- `reservations.duration.seconds` (Histogram)
+Las métricas de servicio/proceso de la aplicación son capturadas por el agente APM.  
+Las métricas de infraestructura se recogen con Elastic Agent.
 
 ## Gestión de Errores y Concurrencia
 

@@ -5,9 +5,7 @@ from sqlalchemy.engine import Engine
 
 # Mockear instrumentación que no es relevante para la lógica del test.
 # Se hace antes de importar la app para evitar que se ejecuten.
-patch("common.otel.setup_telemetry").start()
-patch("opentelemetry.instrumentation.fastapi.FastAPIInstrumentor").start()
-patch("opentelemetry.instrumentation.sqlalchemy.SQLAlchemyInstrumentor").start()
+patch("common.apm.setup_apm").start()
 
 from main import app, get_engine
 

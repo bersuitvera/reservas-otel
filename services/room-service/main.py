@@ -2,13 +2,10 @@ import os
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy import create_engine, text
 from sqlalchemy.engine import Engine
-from common.otel import setup_telemetry
+from common.apm import setup_apm
 from common.logger import log
-from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
-from opentelemetry.instrumentation.sqlalchemy import SQLAlchemyInstrumentor
 
 SERVICE = os.getenv("SERVICE_NAME", "room-service")
-setup_telemetry(SERVICE)
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 _engine: Engine | None = None
@@ -17,11 +14,10 @@ def get_engine() -> Engine:
     global _engine
     if _engine is None:
         _engine = create_engine(DATABASE_URL, pool_pre_ping=True)
-        SQLAlchemyInstrumentor().instrument(engine=_engine)
     return _engine
 
 app = FastAPI(title="Room Service")
-FastAPIInstrumentor.instrument_app(app)
+setup_apm(SERVICE, app)
 
 @app.on_event("startup")
 def startup():

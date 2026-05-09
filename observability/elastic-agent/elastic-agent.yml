@@ -1,0 +1,96 @@
+outputs:
+  default:
+    type: elasticsearch
+    hosts:
+      - http://elasticsearch:9200
+    username: ${ELASTICSEARCH_USERNAME}
+    password: ${ELASTICSEARCH_PASSWORD}
+
+inputs:
+  - id: docker-container-logs
+    type: filestream
+    data_stream.namespace: default
+    streams:
+      - id: docker-container-logs-stream
+        data_stream:
+          dataset: containerlogs
+          type: logs
+        paths:
+          - /var/lib/docker/containers/*/*-json.log
+        parsers:
+          - container:
+              stream: all
+              format: docker
+        processors:
+          - decode_json_fields:
+              fields: ["message"]
+              target: ""
+              overwrite_keys: true
+              add_error_key: true
+
+  - id: system-infra-metrics
+    type: system/metrics
+    data_stream.namespace: default
+    use_output: default
+    streams:
+      - data_stream:
+          dataset: system.cpu
+          type: metrics
+        metricsets:
+          - cpu
+      - data_stream:
+          dataset: system.memory
+          type: metrics
+        metricsets:
+          - memory
+      - data_stream:
+          dataset: system.network
+          type: metrics
+        metricsets:
+          - network
+      - data_stream:
+          dataset: system.filesystem
+          type: metrics
+        metricsets:
+          - filesystem
+
+  - id: docker-infra-metrics
+    type: docker/metrics
+    use_output: default
+    data_stream.namespace: default
+    streams:
+      - data_stream:
+          dataset: docker.cpu
+          type: metrics
+        metricsets:
+          - cpu
+        hosts:
+          - unix:///var/run/docker.sock
+      - data_stream:
+          dataset: docker.memory
+          type: metrics
+        metricsets:
+          - memory
+        hosts:
+          - unix:///var/run/docker.sock
+      - data_stream:
+          dataset: docker.network
+          type: metrics
+        metricsets:
+          - network
+        hosts:
+          - unix:///var/run/docker.sock
+      - data_stream:
+          dataset: docker.diskio
+          type: metrics
+        metricsets:
+          - diskio
+        hosts:
+          - unix:///var/run/docker.sock
+      - data_stream:
+          dataset: docker.container
+          type: metrics
+        metricsets:
+          - container
+        hosts:
+          - unix:///var/run/docker.sock

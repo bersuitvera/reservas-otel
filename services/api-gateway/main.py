@@ -1,16 +1,11 @@
 import os, httpx
 from fastapi import FastAPI, HTTPException
-from common.otel import setup_telemetry
+from common.apm import setup_apm
 from common.logger import log
-from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
-from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
-
-SERVICE = os.getenv("SERVICE_NAME", "api-gateway")
-setup_telemetry(SERVICE)
 
 app = FastAPI(title="API Gateway - Library Rooms")
-FastAPIInstrumentor.instrument_app(app)
-HTTPXClientInstrumentor().instrument()
+SERVICE = os.getenv("SERVICE_NAME", "api-gateway")
+setup_apm(SERVICE, app)
 
 ROOM = os.getenv("ROOM_SERVICE_URL", "http://room-service:8000")
 RES = os.getenv("RESERVATION_SERVICE_URL", "http://reservation-service:8000")

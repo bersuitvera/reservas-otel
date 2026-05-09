@@ -1,16 +1,16 @@
-# Services (Código Python de Prueba)
+# Servicios Python (POC Elastic)
 
-Este directorio contiene los microservicios FastAPI del laboratorio y su instrumentación OpenTelemetry.
+Este directorio contiene los microservicios FastAPI de la POC y la instrumentación de aplicación con Elastic APM Python Agent.
 
 ## Estructura
 
-- `api-gateway/`: orquesta el flujo de negocio.
+- `api-gateway/`: entrada HTTP y orquestación.
 - `room-service/`: catálogo de salas.
-- `user-service/`: consulta de usuarios.
+- `user-service/`: validación de usuarios demo.
 - `reservation-service/`: disponibilidad y creación de reservas.
-- `notification-service/`: consumo asíncrono de eventos.
-- `common/otel.py`: bootstrap común de telemetría.
-- `common/logger.py`: logging JSON correlado con trazas.
+- `notification-service/`: consumidor asíncrono de eventos.
+- `common/apm.py`: bootstrap compartido de APM.
+- `common/logger.py`: logging ECS JSON.
 
 ## Arquitectura de ejecución
 
@@ -20,145 +20,91 @@ api-gateway
   └── reservation-service
         ├── room-service
         ├── PostgreSQL
-        └── Redis (XADD events)
-              └── notification-service (XREAD events)
+        └── Redis (stream events)
+              └── notification-service (worker XREAD)
 ```
 
-## Modelo de datos 
+## Instrumentación de aplicación
 
-### PostgreSQL
+Todos los servicios inicializan APM con:
 
-`rooms`:
+- `setup_apm(SERVICE_NAME, app)` en `common/apm.py`.
 
-- `id` (PK), `name`, `capacity`, `equipment`
+Qué hace:
 
-`reservations`:
+- activa auto-instrumentación de librerías compatibles,
+- registra middleware APM en FastAPI,
+- configura el cliente desde variables `ELASTIC_APM_*`.
 
-- `id` (PK), `room_id`, `user_id`, `start_ts`, `end_ts`, `status`
+## Logging de aplicación
 
-Relación funcional:
+`common/logger.py` define `log(level, msg, **fields)` y:
 
-- `reservations.room_id` referencia lógicamente a `rooms.id` (validación en aplicación).
+- formatea en ECS JSON,
+- escribe por `stdout`,
+- añade metadatos de servicio para consulta y correlación.
 
-### Redis Stream (`events`)
-
-Evento principal emitido:
-
-- `type: reservation.created`
-- `reservation_id`
-- `room_id`
-- `user_id`
-- `trace.traceparent` (propagación OpenTelemetry)
-
-## Instrumentación común (`common/otel.py`)
-
-Todos los servicios llaman a `setup_telemetry(SERVICE_NAME)` al arrancar.
-
-Configura:
-
-- `TracerProvider` + `BatchSpanProcessor` + `OTLPSpanExporter`
-- `MeterProvider` + `PeriodicExportingMetricReader` + `OTLPMetricExporter`
-- `LoggerProvider` + `BatchLogRecordProcessor` + `OTLPLogExporter`
-- `Resource` común:
-  - `service.namespace`
-  - `service.name`
-  - `service.version`
-  - `service.instance.id`
-  - `deployment.environment.name`
-
-## Logging correlado (`common/logger.py`)
-
-`log(level, msg, **fields)`:
-
-- imprime JSON estructurado por `stdout`
-- añade `trace_id` y `span_id` del span activo
-- reemite al logger de OpenTelemetry (misma señal de logs)
-
-Esto permite correlación directa logs-trazas en OpenSearch.
+La ingesta de esos logs la realiza Elastic Agent desde logs Docker.
 
 ## Servicios
 
-### 1) `api-gateway`
-
-Archivo: `api-gateway/main.py`
+### `api-gateway/main.py`
 
 Responsabilidad:
 
-- punto de entrada HTTP para clientes
-- enruta peticiones hacia servicios internos
-- valida usuario antes de crear reserva
+- exponer endpoints públicos,
+- validar usuario en `user-service`,
+- delegar creación de reserva en `reservation-service`.
 
 Endpoints:
 
-- `GET /rooms` -> `room-service /rooms`
-- `GET /availability` -> `reservation-service /availability`
+- `GET /rooms`
+- `GET /availability`
 - `POST /reservations`
-  - valida `user_id` en `user-service /users/{id}`
-  - delega creación en `reservation-service /reservations`
 - `GET /health`
 
-Instrumentación:
-
-- automática FastAPI (`FastAPIInstrumentor`)
-- automática HTTPX (`HTTPXClientInstrumentor`)
-
-### 2) `room-service`
-
-Archivo: `room-service/main.py`
+### `room-service/main.py`
 
 Responsabilidad:
 
-- mantener y exponer catálogo de salas
-- servir validación de sala por id para reservas
+- exponer inventario de salas,
+- responder por sala concreta.
 
 Persistencia:
 
-- PostgreSQL (`rooms`)
-- seed opcional en startup (`STARTUP_SEED=true`)
+- PostgreSQL (`rooms`), con seed opcional (`STARTUP_SEED=true`).
 
 Endpoints:
 
-- `GET /rooms` (filtro opcional `capacity`)
+- `GET /rooms`
 - `GET /rooms/{room_id}`
 - `GET /health`
 
-Instrumentación:
-
-- automática FastAPI
-- automática SQLAlchemy (`SQLAlchemyInstrumentor`)
-
-### 3) `user-service`
-
-Archivo: `user-service/main.py`
+### `user-service/main.py`
 
 Responsabilidad:
 
-- exponer usuarios demo para validación funcional
+- exponer usuarios demo para validación funcional.
 
 Endpoints:
 
 - `GET /users/{user_id}`
 - `GET /health`
 
-Instrumentación:
-
-- automática FastAPI
-
-### 4) `reservation-service`
-
-Archivo: `reservation-service/main.py`
+### `reservation-service/main.py`
 
 Responsabilidad:
 
-- comprobar disponibilidad de salas
-- crear reservas confirmadas
-- publicar evento `reservation.created` en Redis
+- validar sala,
+- verificar solape horario,
+- crear reserva,
+- publicar evento en Redis.
 
-Persistencia y dependencias:
+Dependencias:
 
-- PostgreSQL (`reservations`)
-- HTTP a `room-service` para validar sala
-- Redis Stream `events` para publicación
+- PostgreSQL,
+- HTTP hacia `room-service`,
+- Redis stream `events`.
 
 Endpoints:
 
@@ -173,64 +119,33 @@ Spans manuales de negocio:
 - `reservation.validate.room`
 - `reservation.check.availability`
 - `reservation.persist.confirmed`
-- `reservation.event.publish` (tipo `PRODUCER`)
+- `reservation.event.publish`
 
-Eventos de error:
-
-- en conflicto de franja añade `reservation.conflict` y responde `409`
-
-Métricas de negocio:
-
-- `reservations.created`
-- `reservations.conflict`
-- `reservations.availability.check`
-- `reservations.duration.seconds`
-
-Instrumentación automática adicional:
-
-- FastAPI
-- SQLAlchemy
-- HTTPX
-- Redis
-
-Propagación asíncrona de contexto:
-
-- antes de publicar, inyecta contexto OTel en `event["trace"]`
-- incluye `traceparent` que luego consume `notification-service`
-
-### 5) `notification-service`
-
-Archivo: `notification-service/main.py`
+### `notification-service/main.py`
 
 Responsabilidad:
 
-- consumir stream Redis `events`
-- procesar evento de reserva de forma asíncrona
+- consumir stream Redis,
+- procesar eventos de reserva,
+- mantener continuidad de traza entre publicación y consumo.
 
-Modelo de ejecución:
+Modelo:
 
-- worker en hilo daemon con `XREAD`
-- extracción de contexto desde `event["trace"]`
+- worker en hilo daemon,
+- `XREAD` bloqueante,
+- transacción APM por evento procesado.
 
-Span manual principal:
+Span principal:
 
-- `notification.consume.<event_type>` (tipo `CONSUMER`)
-  - ejemplo actual: `notification.consume.reservation_created`
+- `notification.consume.<event_type>`
 
-Métricas:
+Endpoint:
 
-- `notifications.sent`
-- `notifications.failed`
-- `notifications.processing.latency.ms`
+- `GET /health`
 
-Instrumentación automática:
+## Flujo esperado de trazas
 
-- FastAPI
-- Redis
-
-## Trazas esperadas
-
-### Flujo correcto (`POST /reservations` -> `200`)
+### Caso exitoso (`POST /reservations` -> `200`)
 
 ```text
 api-gateway
@@ -244,7 +159,7 @@ api-gateway
               └── notification.consume.reservation_created
 ```
 
-### Flujo de error (`POST /reservations` duplicado -> `409`)
+### Caso conflicto (`POST /reservations` repetido -> `409`)
 
 ```text
 api-gateway
@@ -253,28 +168,16 @@ api-gateway
         ├── reservation.flow.create
         ├── reservation.validate.room
         └── reservation.check.availability
-              └── reservation.conflict + HTTPException 409
+              └── reservation.conflict + HTTP 409
 ```
 
-## Convenciones importantes
+## Convenciones
 
-- Los atributos de negocio usan prefijo `app_*` para minimizar conflictos de mapping.
-- La ruta principal de demo y test funcional es por `api-gateway`, no por servicios aislados.
-- El script `../scripts/test-services.sh` valida ambos escenarios (éxito y conflicto).
+- Etiquetas de negocio con prefijo `app_*`.
+- Ruta funcional principal de pruebas: `api-gateway`.
+- El script `../scripts/test-services.sh` valida tanto éxito como conflicto.
 
-## Unit tests
+## Tests
 
-Los test  están en `services/tests/` y cubren endpoints y lógica de negocio de todos los servicios.
-
-Instalar dependencias:
-
-```bash
-python3 -m pip install -r common/requirements.txt -r requirements-dev.txt
-```
-
-Ejecutar tests:
-
-```bash
-pytest -q tests
-```
-
+- Unit tests principales en `services/tests/`.
+- Se mockea APM para no depender de infraestructura en pruebas unitarias.

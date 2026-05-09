@@ -2,32 +2,31 @@ import json
 import logging
 import os
 import sys
-import time
 from typing import Any, Dict
-from opentelemetry.trace import get_current_span
+import ecs_logging
+
+
+def configure_ecs_logging() -> None:
+    root_logger = logging.getLogger()
+    if getattr(root_logger, "_ecs_handler_configured", False):
+        return
+
+    handler = logging.StreamHandler(sys.stdout)
+    handler.setFormatter(ecs_logging.StdlibFormatter())
+    root_logger.handlers = [handler]
+    root_logger.setLevel(logging.INFO)
+    root_logger._ecs_handler_configured = True
 
 def log(level: str, msg: str, **fields: Any) -> None:
+    configure_ecs_logging()
     service = os.getenv("SERVICE_NAME", "unknown")
     app_logger = logging.getLogger(service)
-    span = get_current_span()
-    ctx = span.get_span_context() if span else None
-    trace_id = f"{ctx.trace_id:032x}" if ctx and ctx.trace_id else None
-    span_id = f"{ctx.span_id:016x}" if ctx and ctx.span_id else None
-
-    payload: Dict[str, Any] = {
-        "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
-        "level": level,
-        "service": service,
-        "message": msg,
-        "trace_id": trace_id,
-        "span_id": span_id,
+    log_record_fields = {
+        "service.name": service,
+        "service.environment": os.getenv("ENVIRONMENT", "dev"),
         **fields,
     }
-
-    line = json.dumps(payload, ensure_ascii=False)
-    print(line, file=sys.stdout, flush=True)
-
-    app_logger.log(_to_level(level), msg, extra=_sanitize_fields(fields))
+    app_logger.log(_to_level(level), msg, extra=_sanitize_fields(log_record_fields))
 
 
 def _to_level(level: str) -> int:
