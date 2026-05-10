@@ -26,29 +26,37 @@ services:
     image: opensearchproject/opensearch:3.6.0
     environment:
       discovery.type: single-node
-      DISABLE_SECURITY_PLUGIN: "true"
-      DISABLE_INSTALL_DEMO_CONFIG: "true"
       OPENSEARCH_JAVA_OPTS: -Xms512m -Xmx512m
+      OPENSEARCH_INITIAL_ADMIN_PASSWORD: ${OPENSEARCH_INITIAL_ADMIN_PASSWORD:-ChangeMe_123!}
+      plugins.query.datasources.encryption.masterkey: ${OPENSEARCH_DATASOURCE_MASTERKEY:-0123456789abcdef01234567}
     ports:
       - "9200:9200"
       - "9600:9600"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -k -u admin:${OPENSEARCH_INITIAL_ADMIN_PASSWORD:-ChangeMe_123!} https://localhost:9200/_cluster/health >/dev/null 2>&1"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
     volumes:
       - opensearch-data:/usr/share/opensearch/data
 
   opensearch-dashboards:
     image: opensearchproject/opensearch-dashboards:3.6.0
     environment:
-      OPENSEARCH_HOSTS: '["http://opensearch:9200"]'
-      DISABLE_SECURITY_DASHBOARDS_PLUGIN: "true"
+      OPENSEARCH_HOSTS: '["https://opensearch:9200"]'
+      OPENSEARCH_USERNAME: "admin"
+      OPENSEARCH_PASSWORD: ${OPENSEARCH_INITIAL_ADMIN_PASSWORD:-ChangeMe_123!}
+      OPENSEARCH_SSL_VERIFICATIONMODE: "none"
     ports:
       - "5601:5601"
     volumes:
       - ./observability/opensearch-dashboards/opensearch_dashboards.yml:/usr/share/opensearch-dashboards/config/opensearch_dashboards.yml:ro
     depends_on:
       opensearch:
-        condition: service_started
+        condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "curl -s http://localhost:5601/api/status >/dev/null 2>&1"]
+      test: ["CMD-SHELL", "curl -s -u admin:${OPENSEARCH_INITIAL_ADMIN_PASSWORD:-ChangeMe_123!} http://localhost:5601/api/status >/dev/null 2>&1"]
       interval: 10s
       timeout: 5s
       retries: 20
@@ -87,14 +95,19 @@ services:
   opensearch-exporter:
     image: prometheuscommunity/elasticsearch-exporter:v1.10.0
     command:
-      - "--es.uri=http://opensearch:9200"
+      - "--es.uri=https://opensearch:9200"
+      - "--es.ssl-skip-verify"
       - "--es.all"
       - "--es.indices"
       - "--es.shards"
+    environment:
+      ES_USERNAME: "admin"
+      ES_PASSWORD: ${OPENSEARCH_INITIAL_ADMIN_PASSWORD:-ChangeMe_123!}
     ports:
       - "9114:9114"
     depends_on:
-      - opensearch
+      opensearch:
+        condition: service_healthy
 
   otel-collector:
     image: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.150.1
