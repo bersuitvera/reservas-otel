@@ -62,6 +62,24 @@ services:
       retries: 20
       start_period: 30s
 
+  opensearch-dashboards-init:
+    image: python:3.12-alpine
+    command: ["python", "/init/init-opensearch-dashboards.py"]
+    restart: "no"
+    environment:
+      OPENSEARCH_DASHBOARDS_URL: "http://opensearch-dashboards:5601"
+      OPENSEARCH_ENDPOINT: "https://opensearch:9200"
+      OPENSEARCH_USER: "admin"
+      OPENSEARCH_PASSWORD: ${OPENSEARCH_INITIAL_ADMIN_PASSWORD:-ChangeMe_123!}
+      OPENSEARCH_WORKSPACE_NAME: ${OPENSEARCH_WORKSPACE_NAME:-reservas_app}
+      PROMETHEUS_HOST: "prometheus"
+      PROMETHEUS_PORT: "9090"
+    volumes:
+      - ./observability/opensearch-dashboards/init:/init:ro
+    depends_on:
+      opensearch-dashboards:
+        condition: service_healthy
+
   data-prepper:
     image: opensearchproject/data-prepper:2.15.0
     environment:
