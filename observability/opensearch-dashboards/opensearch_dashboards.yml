@@ -1,0 +1,14 @@
+# Needed in Docker so published port 5601 is reachable from host browser.
+server.host: 0.0.0.0
+
+# Enable workspace and observability/discover plugins used by the POC.
+workspace.enabled: true
+data_source.enabled: true
+explore.enabled: true
+explore.discoverTraces.enabled: true
+explore.discoverMetrics.enabled: true
+datasetManagement.enabled: true
+
+uiSettings:
+  overrides:
+    "home:useNewHomePage": true
