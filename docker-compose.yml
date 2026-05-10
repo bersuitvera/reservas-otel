@@ -64,6 +64,9 @@ services:
 
   data-prepper:
     image: opensearchproject/data-prepper:2.15.0
+    environment:
+      OPENSEARCH_USERNAME: "admin"
+      OPENSEARCH_PASSWORD: ${OPENSEARCH_INITIAL_ADMIN_PASSWORD:-ChangeMe_123!}
     volumes:
       - ./observability/data-prepper/pipelines/traces-pipeline.yaml:/usr/share/data-prepper/pipelines/pipelines.yaml:ro
       - ./observability/data-prepper/dlq:/usr/share/data-prepper/dlq
@@ -72,8 +75,10 @@ services:
       - "21890:21890" # OTLP gRPC para traces/logs desde OTel Collector
       - "4900:4900"   # Data Prepper API
     depends_on:
-      - opensearch
-      - prometheus
+      opensearch:
+        condition: service_healthy
+      prometheus:
+        condition: service_started
 
   prometheus:
     image: prom/prometheus:v3.8.1

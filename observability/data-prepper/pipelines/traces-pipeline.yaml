@@ -59,7 +59,10 @@ traces-raw-pipeline:
   sink:
     - opensearch:
         hosts:
-          - "http://opensearch:9200"
+          - "https://opensearch:9200"
+        username: "admin"
+        password: "ChangeMe_123!"
+        insecure: true
         index_type: trace-analytics-plain-raw
         max_retries: 5
         dlq_file: /usr/share/data-prepper/dlq/traces-raw.dlq
@@ -89,7 +92,10 @@ service-map-pipeline:
   sink:
     - opensearch:
         hosts:
-          - "http://opensearch:9200"
+          - "https://opensearch:9200"
+        username: "admin"
+        password: "ChangeMe_123!"
+        insecure: true
         index_type: otel-v2-apm-service-map
         max_retries: 5
         dlq_file: /usr/share/data-prepper/dlq/service-map.dlq
@@ -122,7 +128,10 @@ logs-pipeline:
   sink:
     - opensearch:
         hosts:
-          - "http://opensearch:9200"
+          - "https://opensearch:9200"
+        username: "admin"
+        password: "ChangeMe_123!"
+        insecure: true
         index_type: log-analytics-plain
         max_retries: 5
         dlq_file: /usr/share/data-prepper/dlq/logs.dlq
@@ -148,7 +157,10 @@ service-map-legacy-pipeline:
   sink:
     - opensearch:
         hosts:
-          - "http://opensearch:9200"
+          - "https://opensearch:9200"
+        username: "admin"
+        password: "ChangeMe_123!"
+        insecure: true
         index_type: trace-analytics-service-map
         max_retries: 5
         dlq_file: /usr/share/data-prepper/dlq/service-map.dlq
