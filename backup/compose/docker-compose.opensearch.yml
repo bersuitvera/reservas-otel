@@ -1,0 +1,51 @@
+volumes:
+  opensearch-data:
+
+services:
+  opensearch:
+    image: opensearchproject/opensearch:3.6.0
+    environment:
+      discovery.type: single-node
+      DISABLE_SECURITY_PLUGIN: "true"
+      DISABLE_INSTALL_DEMO_CONFIG: "true"
+      OPENSEARCH_JAVA_OPTS: -Xms512m -Xmx512m
+    ports:
+      - "9200:9200"
+      - "9600:9600"
+    volumes:
+      - opensearch-data:/usr/share/opensearch/data
+
+  opensearch-dashboards:
+    image: opensearchproject/opensearch-dashboards:3.6.0
+    environment:
+      OPENSEARCH_HOSTS: '["http://opensearch:9200"]'
+      DISABLE_SECURITY_DASHBOARDS_PLUGIN: "true"
+    ports:
+      - "5601:5601"
+    depends_on:
+      - opensearch
+
+  data-prepper:
+    image: opensearchproject/data-prepper:2.15.0
+    volumes:
+      - ./observability/data-prepper/pipelines/traces-pipeline.yaml:/usr/share/data-prepper/pipelines/pipelines.yaml:ro
+      - ./observability/data-prepper/dlq:/usr/share/data-prepper/dlq
+      - ./observability/data-prepper/config/data-prepper-config.yaml:/usr/share/data-prepper/config/data-prepper-config.yaml:ro
+    ports:
+      - "21890:21890"
+      - "4900:4900"
+    depends_on:
+      - opensearch
+
+  otel-collector:
+    image: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.150.1
+    command: ["--config=/etc/otelcol-contrib/config.yaml"]
+    mem_limit: 512m
+    volumes:
+      - ./observability/otel-collector/config.yaml:/etc/otelcol-contrib/config.yaml:ro
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+    depends_on:
+      data-prepper:
+        condition: service_started
