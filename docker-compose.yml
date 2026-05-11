@@ -1,5 +1,5 @@
 volumes:
-  opensearch-data:
+  elasticsearch-data:
 
 services:
   db:
@@ -21,53 +21,55 @@ services:
     ports:
       - "6379:6379"
 
-  opensearch:
-    image: opensearchproject/opensearch:3.6.0
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.3.3
     environment:
       discovery.type: single-node
-      DISABLE_SECURITY_PLUGIN: "true"
-      DISABLE_INSTALL_DEMO_CONFIG: "true"
-      OPENSEARCH_JAVA_OPTS: -Xms512m -Xmx512m
+      xpack.security.enabled: "true"
+      xpack.security.http.ssl.enabled: "false"
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD:-changeme}
+      ES_JAVA_OPTS: -Xms512m -Xmx512m
     ports:
       - "9200:9200"
-      - "9600:9600"
     volumes:
-      - opensearch-data:/usr/share/opensearch/data
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s -u elastic:${ELASTIC_PASSWORD:-changeme} http://localhost:9200/_cluster/health >/dev/null 2>&1"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
 
-  opensearch-dashboards:
-    image: opensearchproject/opensearch-dashboards:3.6.0
+  kibana:
+    image: docker.elastic.co/kibana/kibana:9.3.3
     environment:
-      OPENSEARCH_HOSTS: '["http://opensearch:9200"]'
-      DISABLE_SECURITY_DASHBOARDS_PLUGIN: "true"
+      ELASTICSEARCH_HOSTS: '["http://elasticsearch:9200"]'
+      ELASTICSEARCH_USERNAME: ${ELASTICSEARCH_USERNAME:-elastic}
+      ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD:-changeme}
+      XPACK_SECURITY_ENABLED: "true"
+      XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY: ${KIBANA_ENCRYPTED_SAVED_OBJECTS_KEY:-reservas-otel-dev-encrypted-saved-objects-key-32}
+      XPACK_SECURITY_ENCRYPTIONKEY: ${KIBANA_SECURITY_ENCRYPTION_KEY:-reservas-otel-dev-security-encryption-key-32}
+      XPACK_REPORTING_ENCRYPTIONKEY: ${KIBANA_REPORTING_ENCRYPTION_KEY:-reservas-otel-dev-reporting-encryption-key-32}
     ports:
       - "5601:5601"
     depends_on:
-      - opensearch
+      elasticsearch:
+        condition: service_healthy
 
-  data-prepper:
-    image: opensearchproject/data-prepper:2.15.0
+  edot-collector:
+    image: docker.elastic.co/elastic-agent/elastic-otel-collector:9.3.3
+    command: ["--config=/etc/otelcol/config.yaml"]
+    environment:
+      ELASTICSEARCH_USERNAME: ${ELASTICSEARCH_USERNAME:-elastic}
+      ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD:-changeme}
     volumes:
-      - ./observability/data-prepper/pipelines/traces-pipeline.yaml:/usr/share/data-prepper/pipelines/pipelines.yaml:ro
-      - ./observability/data-prepper/dlq:/usr/share/data-prepper/dlq
-      - ./observability/data-prepper/config/data-prepper-config.yaml:/usr/share/data-prepper/config/data-prepper-config.yaml:ro
+      - ./observability/edot-collector/config.yaml:/etc/otelcol/config.yaml:ro
     ports:
-      - "21890:21890" # OTLP gRPC unificado para traces/logs/metrics
-      - "4900:4900"   # Data Prepper API
+      - "4317:4317"
+      - "4318:4318"
     depends_on:
-      - opensearch
-
-  otel-collector:
-    image: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.150.1
-    command: ["--config=/etc/otelcol-contrib/config.yaml"]
-    mem_limit: 512m
-    volumes:
-      - ./observability/otel-collector/config.yaml:/etc/otelcol-contrib/config.yaml:ro
-    ports:
-      - "4317:4317" # OTLP gRPC receiver
-      - "4318:4318" # OTLP HTTP receiver
-    depends_on:
-      data-prepper:
-        condition: service_started
+      elasticsearch:
+        condition: service_healthy
 
   room-service:
     build:
@@ -79,15 +81,15 @@ services:
       SERVICE_NAME: room-service
       DATABASE_URL: postgresql+psycopg://user:password@db:5432/reservas_db
       STARTUP_SEED: "true"
-      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://otel-collector:4318/v1/traces
-      OTEL_EXPORTER_OTLP_LOGS_ENDPOINT: http://otel-collector:4318/v1/logs
-      OTEL_EXPORTER_OTLP_METRICS_ENDPOINT: http://otel-collector:4318/v1/metrics
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://edot-collector:4318/v1/traces
+      OTEL_EXPORTER_OTLP_LOGS_ENDPOINT: http://edot-collector:4318/v1/logs
+      OTEL_EXPORTER_OTLP_METRICS_ENDPOINT: http://edot-collector:4318/v1/metrics
     ports:
       - "8081:8000"
     depends_on:
       db:
         condition: service_healthy
-      otel-collector:
+      edot-collector:
         condition: service_started
 
   user-service:
@@ -98,13 +100,13 @@ services:
         SERVICE_NAME: user-service
     environment:
       SERVICE_NAME: user-service
-      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://otel-collector:4318/v1/traces
-      OTEL_EXPORTER_OTLP_LOGS_ENDPOINT: http://otel-collector:4318/v1/logs
-      OTEL_EXPORTER_OTLP_METRICS_ENDPOINT: http://otel-collector:4318/v1/metrics
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://edot-collector:4318/v1/traces
+      OTEL_EXPORTER_OTLP_LOGS_ENDPOINT: http://edot-collector:4318/v1/logs
+      OTEL_EXPORTER_OTLP_METRICS_ENDPOINT: http://edot-collector:4318/v1/metrics
     ports:
       - "8082:8000"
     depends_on:
-      otel-collector:
+      edot-collector:
         condition: service_started
 
   reservation-service:
@@ -118,9 +120,9 @@ services:
       DATABASE_URL: postgresql+psycopg://user:password@db:5432/reservas_db
       REDIS_URL: redis://redis:6379/0
       ROOM_SERVICE_URL: http://room-service:8000
-      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://otel-collector:4318/v1/traces
-      OTEL_EXPORTER_OTLP_LOGS_ENDPOINT: http://otel-collector:4318/v1/logs
-      OTEL_EXPORTER_OTLP_METRICS_ENDPOINT: http://otel-collector:4318/v1/metrics
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://edot-collector:4318/v1/traces
+      OTEL_EXPORTER_OTLP_LOGS_ENDPOINT: http://edot-collector:4318/v1/logs
+      OTEL_EXPORTER_OTLP_METRICS_ENDPOINT: http://edot-collector:4318/v1/metrics
     ports:
       - "8083:8000"
     depends_on:
@@ -128,7 +130,7 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
-      otel-collector:
+      edot-collector:
         condition: service_started
 
   notification-service:
@@ -140,15 +142,15 @@ services:
     environment:
       SERVICE_NAME: notification-service
       REDIS_URL: redis://redis:6379/0
-      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://otel-collector:4318/v1/traces
-      OTEL_EXPORTER_OTLP_LOGS_ENDPOINT: http://otel-collector:4318/v1/logs
-      OTEL_EXPORTER_OTLP_METRICS_ENDPOINT: http://otel-collector:4318/v1/metrics
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://edot-collector:4318/v1/traces
+      OTEL_EXPORTER_OTLP_LOGS_ENDPOINT: http://edot-collector:4318/v1/logs
+      OTEL_EXPORTER_OTLP_METRICS_ENDPOINT: http://edot-collector:4318/v1/metrics
     ports:
       - "8084:8000"
     depends_on:
       redis:
         condition: service_started
-      otel-collector:
+      edot-collector:
         condition: service_started
 
   api-gateway:
@@ -162,21 +164,12 @@ services:
       ROOM_SERVICE_URL: http://room-service:8000
       RESERVATION_SERVICE_URL: http://reservation-service:8000
       USER_SERVICE_URL: http://user-service:8000
-      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://otel-collector:4318/v1/traces
-      OTEL_EXPORTER_OTLP_LOGS_ENDPOINT: http://otel-collector:4318/v1/logs
-      OTEL_EXPORTER_OTLP_METRICS_ENDPOINT: http://otel-collector:4318/v1/metrics
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://edot-collector:4318/v1/traces
+      OTEL_EXPORTER_OTLP_LOGS_ENDPOINT: http://edot-collector:4318/v1/logs
+      OTEL_EXPORTER_OTLP_METRICS_ENDPOINT: http://edot-collector:4318/v1/metrics
     ports:
       - "8080:8000"
     depends_on:
       - room-service
       - reservation-service
-      - otel-collector
-
-# Comandos útiles:
-# docker-compose up --build
-# Acceso Room Service: http://localhost:8081/rooms
-# Acceso User Service: http://localhost:8082/users/1
-# Acceso Reservation Service: http://localhost:8083/docs
-# Acceso Notification Service: http://localhost:8084/health
-# OpenSearch Dashboards: http://localhost:5601
-# Data Prepper API: http://localhost:4900
+      - edot-collector
