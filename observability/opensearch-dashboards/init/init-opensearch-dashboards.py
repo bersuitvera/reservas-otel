@@ -1,4 +1,39 @@
 #!/usr/bin/env python3
+"""Inicializa el workspace de OpenSearch Dashboards para la POC de reservas.
+
+Este script se ejecuta desde el servicio `opensearch-dashboards-init` definido en
+`docker-compose.yml`. Su objetivo es dejar OpenSearch Dashboards listo para
+explorar logs, trazas, service map y metricas de Prometheus sin pasos manuales en
+la interfaz web.
+
+Pasos necesarios para una inicializacion correcta:
+
+1. OpenSearch debe estar levantado, sano y accesible por HTTPS desde la red de
+   Docker. El usuario y password deben coincidir con `OPENSEARCH_USER` y
+   `OPENSEARCH_PASSWORD`.
+2. OpenSearch Dashboards debe arrancar con `workspace.enabled`,
+   `data_source.enabled`, `explore.enabled`, `explore.discoverTraces.enabled`,
+   `explore.discoverMetrics.enabled` y `datasetManagement.enabled` activados en
+   `observability/opensearch-dashboards/opensearch_dashboards.yml`.
+3. El workspace indicado por `OPENSEARCH_WORKSPACE_NAME` debe existir antes de
+   ejecutar este script. Si no existe, el bootstrap se omite para no crear
+   objetos en un contexto incorrecto.
+4. Prometheus debe ser resoluble desde el contenedor init mediante
+   `PROMETHEUS_HOST` y `PROMETHEUS_PORT` para que la conexion Direct Query pueda
+   apuntar al endpoint correcto.
+5. Ejecutar el servicio init despues del healthcheck de Dashboards:
+
+       docker compose up -d opensearch-dashboards-init
+
+   En el flujo normal basta con `docker compose up -d --build`, porque Compose
+   respeta el `depends_on` configurado para OpenSearch y Dashboards.
+
+El script es idempotente en los objetos principales: primero busca data sources,
+data connections, index patterns y correlations existentes, y solo crea lo que
+falte. Esto permite relanzar el contenedor init despues de reinicios o cambios de
+volumenes sin duplicar la configuracion.
+"""
+
 import base64
 import json
 import os
@@ -24,11 +59,19 @@ JSON_HEADERS = {
 
 
 def _auth_header():
+    """Construye el header Basic Auth usado por todas las llamadas a Dashboards."""
     token = base64.b64encode(f"{USERNAME}:{PASSWORD}".encode("utf-8")).decode("utf-8")
     return f"Basic {token}"
 
 
 def _request(method, path, payload=None, timeout=10):
+    """Ejecuta una peticion HTTP contra la API de OpenSearch Dashboards.
+
+    Devuelve siempre una tupla `(status, body)` para simplificar el flujo de
+    bootstrap: los codigos 2xx y los errores HTTP se tratan de forma uniforme.
+    El `body` se parsea como JSON cuando es posible y se deja en `{"raw": ...}`
+    para endpoints que devuelven texto plano.
+    """
     body = None
     headers = dict(JSON_HEADERS)
     headers["Authorization"] = _auth_header()
@@ -66,6 +109,11 @@ def _request(method, path, payload=None, timeout=10):
 
 
 def wait_for_dashboards():
+    """Espera hasta que `/api/status` indique que Dashboards esta listo.
+
+    Aunque Compose ya espera el healthcheck del servicio, este reintento local
+    hace que el script sea tolerante a arranques lentos o ejecuciones manuales.
+    """
     print("Waiting for OpenSearch Dashboards...")
     for _ in range(90):
         status, _ = _request("GET", "/api/status", timeout=5)
@@ -78,6 +126,13 @@ def wait_for_dashboards():
 
 
 def get_workspace_id():
+    """Obtiene el ID del workspace configurado en `OPENSEARCH_WORKSPACE_NAME`.
+
+    Las APIs de objetos guardados que se usan para Discover/APM son scoped al
+    workspace (`/w/{workspace_id}/...`). Si la API de workspaces no esta
+    disponible o el workspace no existe, se devuelve `None` y el bootstrap se
+    detiene.
+    """
     status, body = _request("POST", "/api/workspaces/_list", {})
     if status != 200:
         print(f"Workspace API not available (status={status}), skipping workspace bootstrap")
@@ -93,6 +148,7 @@ def get_workspace_id():
 
 
 def find_saved_object(workspace_id, obj_type, title):
+    """Busca un saved object por tipo y titulo dentro de un workspace."""
     quoted_title = urllib.parse.quote(title)
     path = (
         f"/w/{workspace_id}/api/saved_objects/_find"
@@ -109,6 +165,11 @@ def find_saved_object(workspace_id, obj_type, title):
 
 
 def find_saved_object_global(obj_type, title, title_field="title"):
+    """Busca un saved object global por tipo y campo de titulo.
+
+    Algunos objetos, como `data-source` y `data-connection`, se crean en el
+    ambito global de Dashboards y despues se asocian al workspace.
+    """
     quoted_title = urllib.parse.quote(title)
     path = (
         f"/api/saved_objects/_find"
@@ -125,6 +186,13 @@ def find_saved_object_global(obj_type, title, title_field="title"):
 
 
 def create_index_pattern(workspace_id, title, time_field, signal_type=None, schema_mappings=None):
+    """Crea o reutiliza un index pattern del workspace.
+
+    Los index patterns indican a Discover/Explore que indices de OpenSearch debe
+    consultar y que campo temporal debe usar. Para logs se anade ademas
+    `signalType` y `schemaMappings`, necesarios para que Dashboards reconozca
+    traceId, spanId y service.name en el formato OTEL.
+    """
     existing = find_saved_object(workspace_id, "index-pattern", title)
     if existing:
         print(f"Index pattern already exists: {title}")
@@ -153,6 +221,12 @@ def create_index_pattern(workspace_id, title, time_field, signal_type=None, sche
 
 
 def create_or_get_local_cluster_datasource(workspace_id):
+    """Crea o reutiliza el data source `local_cluster` para OpenSearch.
+
+    Este objeto representa el cluster OpenSearch local como fuente de datos de
+    Dashboards. Se almacena de forma global y luego se asocia al workspace para
+    que este pueda usarlo.
+    """
     title = "local_cluster"
     # Datasource saved object is global (same pattern used by observability-stack init).
     status, body = _request(
@@ -195,6 +269,7 @@ def create_or_get_local_cluster_datasource(workspace_id):
 
 
 def associate_saved_object(workspace_id, obj_type, obj_id):
+    """Asocia un saved object global al workspace indicado."""
     payload = {"workspaceId": workspace_id, "savedObjects": [{"type": obj_type, "id": obj_id}]}
     status, body = _request("POST", "/api/workspaces/_associate", payload)
     if status == 200:
@@ -204,6 +279,12 @@ def associate_saved_object(workspace_id, obj_type, obj_id):
 
 
 def create_or_get_prometheus_dataconnection(workspace_id):
+    """Crea o reutiliza la conexion Direct Query hacia Prometheus.
+
+    La correlacion `apm-config` referencia esta conexion para que la experiencia
+    APM pueda consultar metricas desde Prometheus. El endpoint se forma con
+    `PROMETHEUS_HOST` y `PROMETHEUS_PORT`.
+    """
     connection_name = "ObservabilityStack_Prometheus"
     existing = find_saved_object_global("data-connection", connection_name, "connectionId")
     if existing:
@@ -247,6 +328,7 @@ def create_or_get_prometheus_dataconnection(workspace_id):
 
 
 def get_existing_correlation_id(workspace_id, title):
+    """Devuelve el ID de una correlation existente en el workspace por titulo."""
     quoted_title = urllib.parse.quote(title)
     path = (
         f"/w/{workspace_id}/api/saved_objects/_find"
@@ -263,6 +345,12 @@ def get_existing_correlation_id(workspace_id, title):
 
 
 def create_trace_to_logs_correlation(workspace_id, traces_pattern_id, logs_pattern_id):
+    """Crea la correlation que permite saltar de trazas a logs relacionados.
+
+    La correlation enlaza el index pattern de trazas (`otel-v1-apm-span*`) con el
+    de logs (`logs-otel-v1*`). Dashboards usa esta relacion para buscar logs que
+    compartan `traceId`/`spanId` con una traza.
+    """
     title = "trace-to-logs_otel-v1-apm-span*"
     existing = get_existing_correlation_id(workspace_id, title)
     if existing:
@@ -297,6 +385,12 @@ def create_trace_to_logs_correlation(workspace_id, traces_pattern_id, logs_patte
 
 
 def create_apm_config_correlation(workspace_id, traces_pattern_id, service_map_pattern_id, prom_conn_id):
+    """Crea la correlation de configuracion APM del workspace.
+
+    Esta correlation conecta tres piezas que APM necesita trabajar juntas:
+    trazas, service map y la conexion a Prometheus. Si no existe conexion de
+    Prometheus, se omite para evitar una configuracion parcial invalida.
+    """
     if not prom_conn_id:
         print("Skipping apm-config correlation (no Prometheus data-connection id)")
         return None
@@ -337,6 +431,7 @@ def create_apm_config_correlation(workspace_id, traces_pattern_id, service_map_p
 
 
 def set_default_index(workspace_id, index_pattern_id):
+    """Marca el index pattern de logs como indice por defecto del workspace."""
     payload = {"value": index_pattern_id}
     status, body = _request(
         "POST",
@@ -350,6 +445,7 @@ def set_default_index(workspace_id, index_pattern_id):
 
 
 def main():
+    """Orquesta el bootstrap completo del workspace de Dashboards."""
     if not wait_for_dashboards():
         return
 
