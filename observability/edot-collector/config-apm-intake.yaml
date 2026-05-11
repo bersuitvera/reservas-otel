@@ -1,0 +1,72 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+  filelog:
+    include:
+      - /var/lib/docker/containers/*/*-json.log
+    start_at: end
+    include_file_path: true
+    operators:
+      - type: json_parser
+        parse_from: body
+        on_error: send_quiet
+      - type: move
+        from: attributes.log
+        to: body
+      - type: json_parser
+        if: 'body matches "^\\{.*\\}$"'
+        parse_from: body
+        on_error: send_quiet
+
+processors:
+  memory_limiter:
+    check_interval: 5s
+    limit_percentage: 80
+    spike_limit_percentage: 25
+
+  resourcedetection:
+    detectors: [env, system]
+    timeout: 2s
+    override: false
+
+  transform/logs:
+    error_mode: ignore
+    log_statements:
+      - context: log
+        statements:
+          - set(trace_id.string, attributes["trace.id"]) where attributes["trace.id"] != nil
+          - set(span_id.string, attributes["span.id"]) where attributes["span.id"] != nil
+
+  batch:
+    timeout: 1s
+    send_batch_size: 1024
+
+exporters:
+  elasticsearch:
+    endpoint: http://elasticsearch:9200
+    user: ${env:ELASTICSEARCH_USERNAME}
+    password: ${env:ELASTICSEARCH_PASSWORD}
+    mapping:
+      mode: otel
+
+  otlphttp/apm:
+    endpoint: http://apm-server:8200
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [resourcedetection, memory_limiter, batch]
+      exporters: [otlphttp/apm]
+    logs:
+      receivers: [filelog]
+      processors: [resourcedetection, memory_limiter, transform/logs, batch]
+      exporters: [elasticsearch]
+    metrics:
+      receivers: [otlp]
+      processors: [resourcedetection, memory_limiter, batch]
+      exporters: [otlphttp/apm]

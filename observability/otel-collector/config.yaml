@@ -72,6 +72,12 @@ exporters:
     tls:
       insecure: true
 
+  # Exports application metrics to Prometheus OTLP receiver.
+  otlphttp/prometheus:
+    endpoint: http://prometheus:9090/api/v1/otlp
+    tls:
+      insecure: true
+
 service:
   pipelines:
     traces:
@@ -85,4 +91,15 @@ service:
     metrics:
       receivers: [otlp]
       processors: [resourcedetection, memory_limiter, batch]
-      exporters: [otlp_grpc/data-prepper]
+      exporters: [otlphttp/prometheus]
+
+  telemetry:
+    logs:
+      level: info
+    metrics:
+      readers:
+        - pull:
+            exporter:
+              prometheus:
+                host: 0.0.0.0
+                port: 8888

@@ -1,2 +1,9 @@
 ssl: false
 serverPort: 4900
+
+experimental:
+  enabled_plugins:
+    processor:
+      - otel_apm_service_map
+    sink:
+      - prometheus
