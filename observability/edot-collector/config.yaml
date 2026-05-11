@@ -12,6 +12,8 @@ processors:
     limit_percentage: 80
     spike_limit_percentage: 25
 
+  cumulativetodelta:
+
   resourcedetection:
     detectors: [env, system]
     timeout: 2s
@@ -41,5 +43,5 @@ service:
       exporters: [elasticsearch]
     metrics:
       receivers: [otlp]
-      processors: [resourcedetection, memory_limiter, batch]
+      processors: [resourcedetection, memory_limiter, cumulativetodelta, batch]
       exporters: [elasticsearch]
