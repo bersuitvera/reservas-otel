@@ -41,6 +41,29 @@ App -> EDoT Collector -> Elasticsearch -> Kibana
 [Kibana]
 ```
 
+## Mejoras de integración aplicadas (5)
+
+1. **`elasticapm` processor + connector en EDoT**  
+   Se añadió `elasticapm` para enriquecer trazas y generar métricas agregadas APM compatibles con vistas de servicio.
+
+2. **Pipelines de métricas separadas**  
+   - `metrics/app`: métricas OTLP de la aplicación.  
+   - `metrics/aggregated-apm`: métricas derivadas desde `elasticapm`.
+
+3. **Robustez de exportación a Elasticsearch**  
+   El exporter `elasticsearch` ahora usa `sending_queue` para tolerancia a picos y desacople de envío.
+
+4. **Saneado de atributos sensibles**  
+   Se incorpora `attributes/sanitize` para eliminar campos sensibles o de alta cardinalidad antes de indexar.
+
+5. **Temporality de métricas alineada con Elastic**  
+   Se fuerza temporality delta para histogramas/contadores en la app (`services/common/otel.py`) y se mantiene `cumulativetodelta` en collector para compatibilidad.
+
+### Nota operativa
+
+- El warning de exemplars no bloquea ingestión de trazas/logs/métricas principales en este piloto.
+- Configuración activa EDoT: [config.yaml](/home/avr12s/repos/github/reservas-otel/observability/edot-collector/config.yaml)
+
 ## Levantar el entorno
 
 ```bash
@@ -60,8 +83,12 @@ Todos los servicios de aplicación publican hacia `edot-collector`:
 ## Seguridad
 
 - Elasticsearch se ejecuta con `xpack.security.enabled=true`.
-- Kibana se autentica contra Elasticsearch con `ELASTICSEARCH_USERNAME/ELASTIC_PASSWORD`.
+- Kibana se autentica contra Elasticsearch con `ELASTICSEARCH_SERVICEACCOUNTTOKEN` (service account `elastic/kibana`), requerido en Elastic 9 para evitar el uso del superusuario `elastic`.
 - Variables de entorno de ejemplo en `.env`.
+
+## ¿Hace falta APM Server?
+
+No en esta rama. El flujo activo es `App -> EDoT -> Elasticsearch -> Kibana`; EDoT exporta directamente a Elasticsearch y Kibana consume los data streams APM/OTEL resultantes.
 
 ## Smoke test funcional
 

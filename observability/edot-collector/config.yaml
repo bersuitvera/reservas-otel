@@ -6,11 +6,23 @@ receivers:
       http:
         endpoint: 0.0.0.0:4318
 
+connectors:
+  elasticapm: {}
+
 processors:
   memory_limiter:
     check_interval: 5s
     limit_percentage: 80
     spike_limit_percentage: 25
+
+  attributes/sanitize:
+    actions:
+      - key: http.request.header.authorization
+        action: delete
+      - key: http.response.header.set-cookie
+        action: delete
+      - key: user.id
+        action: delete
 
   cumulativetodelta:
 
@@ -18,6 +30,8 @@ processors:
     detectors: [env, system]
     timeout: 2s
     override: false
+
+  elasticapm: {}
 
   batch:
     timeout: 1s
@@ -30,18 +44,34 @@ exporters:
     password: ${env:ELASTICSEARCH_PASSWORD}
     mapping:
       mode: otel
+    sending_queue:
+      enabled: true
+      sizer: requests
+      num_consumers: 10
+      queue_size: 100
+      block_on_overflow: true
+      wait_for_result: false
+      batch:
+        flush_timeout: 10s
+        min_size: 500000
+        max_size: 2000000
+        sizer: bytes
 
 service:
   pipelines:
     traces:
       receivers: [otlp]
-      processors: [resourcedetection, memory_limiter, batch]
-      exporters: [elasticsearch]
+      processors: [resourcedetection, memory_limiter, attributes/sanitize, elasticapm, batch]
+      exporters: [elasticapm, elasticsearch]
     logs:
       receivers: [otlp]
-      processors: [resourcedetection, memory_limiter, batch]
+      processors: [resourcedetection, memory_limiter, attributes/sanitize, batch]
       exporters: [elasticsearch]
-    metrics:
+    metrics/app:
       receivers: [otlp]
-      processors: [resourcedetection, memory_limiter, cumulativetodelta, batch]
+      processors: [resourcedetection, memory_limiter, attributes/sanitize, cumulativetodelta, batch]
+      exporters: [elasticsearch]
+    metrics/aggregated-apm:
+      receivers: [elasticapm]
+      processors: [memory_limiter, batch]
       exporters: [elasticsearch]

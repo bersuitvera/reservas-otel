@@ -44,8 +44,7 @@ services:
     image: docker.elastic.co/kibana/kibana:9.3.3
     environment:
       ELASTICSEARCH_HOSTS: '["http://elasticsearch:9200"]'
-      ELASTICSEARCH_USERNAME: ${ELASTICSEARCH_USERNAME:-elastic}
-      ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD:-changeme}
+      ELASTICSEARCH_SERVICEACCOUNTTOKEN: ${KIBANA_SERVICE_ACCOUNT_TOKEN}
       XPACK_SECURITY_ENABLED: "true"
       XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY: ${KIBANA_ENCRYPTED_SAVED_OBJECTS_KEY:-reservas-otel-dev-encrypted-saved-objects-key-32}
       XPACK_SECURITY_ENCRYPTIONKEY: ${KIBANA_SECURITY_ENCRYPTION_KEY:-reservas-otel-dev-security-encryption-key-32}
