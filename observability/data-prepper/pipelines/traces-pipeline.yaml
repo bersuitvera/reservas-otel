@@ -1,5 +1,5 @@
 # Unified OTLP entrypoint:
-# - receives traces/logs/metrics on port 21890
+# - receives traces/logs on port 21890
 # - routes by signal type to dedicated internal pipelines
 entry-pipeline:
   delay: "100"
@@ -16,7 +16,6 @@ entry-pipeline:
     # getEventType() is produced by output_format: otel.
     - traces: 'getEventType() == "TRACE"'
     - logs: 'getEventType() == "LOG"'
-    - metrics: 'getEventType() == "METRIC"'
 
   buffer:
     bounded_blocking:
@@ -35,15 +34,14 @@ entry-pipeline:
           - traces
 
     - pipeline:
+        name: service-map-legacy-pipeline
+        routes:
+          - traces
+
+    - pipeline:
         name: logs-pipeline
         routes:
           - logs
-
-    - pipeline:
-        name: metrics-pipeline
-        routes:
-          - metrics
-
 
 traces-raw-pipeline:
   source:
@@ -61,7 +59,10 @@ traces-raw-pipeline:
   sink:
     - opensearch:
         hosts:
-          - "http://opensearch:9200"
+          - "https://opensearch:9200"
+        username: "admin"
+        password: "ChangeMe_123!"
+        insecure: true
         index_type: trace-analytics-plain-raw
         max_retries: 5
         dlq_file: /usr/share/data-prepper/dlq/traces-raw.dlq
@@ -80,17 +81,32 @@ service-map-pipeline:
       batch_size: 160
 
   processor:
-    - service_map:
-        window_duration: 180
+    - otel_apm_service_map:
+        group_by_attributes: [telemetry.sdk.language]
+        window_duration: 10s
+
+  route:
+    - otel_apm_service_map_route: 'getEventType() == "SERVICE_MAP"'
+    - service_processed_metrics: 'getEventType() == "METRIC"'
 
   sink:
     - opensearch:
         hosts:
-          - "http://opensearch:9200"
-        index_type: trace-analytics-service-map
+          - "https://opensearch:9200"
+        username: "admin"
+        password: "ChangeMe_123!"
+        insecure: true
+        index_type: otel-v2-apm-service-map
         max_retries: 5
         dlq_file: /usr/share/data-prepper/dlq/service-map.dlq
-
+        routes: [otel_apm_service_map_route]
+    - prometheus:
+        url: "http://prometheus:9090/api/v1/write"
+        insecure: true
+        threshold:
+          max_events: 500
+          flush_interval: 5s
+        routes: [service_processed_metrics]
 
 logs-pipeline:
   source:
@@ -102,16 +118,29 @@ logs-pipeline:
       buffer_size: 10240
       batch_size: 160
 
+  processor:
+    - copy_values:
+        entries:
+          - from_key: "time"
+            to_key: "@timestamp"
+            overwrite_if_to_key_exists: true
+
   sink:
     - opensearch:
         hosts:
-          - "http://opensearch:9200"
+          - "https://opensearch:9200"
+        username: "admin"
+        password: "ChangeMe_123!"
+        insecure: true
         index_type: log-analytics-plain
         max_retries: 5
         dlq_file: /usr/share/data-prepper/dlq/logs.dlq
 
 
-metrics-pipeline:
+# Compatibility pipeline for Trace Analytics service map view (v1).
+service-map-legacy-pipeline:
+  delay: "100"
+
   source:
     pipeline:
       name: entry-pipeline
@@ -122,19 +151,16 @@ metrics-pipeline:
       batch_size: 160
 
   processor:
-    - otel_metrics:
-        calculate_histogram_buckets: true
-        calculate_exponential_histogram_buckets: true
-        exponential_histogram_max_allowed_scale: 10
-        flatten_attributes: true
+    - service_map:
+        window_duration: 180
 
   sink:
     - opensearch:
         hosts:
-          - "http://opensearch:9200"
-        index_type: metric-analytics-plain
+          - "https://opensearch:9200"
+        username: "admin"
+        password: "ChangeMe_123!"
+        insecure: true
+        index_type: trace-analytics-service-map
         max_retries: 5
-        dlq_file: /usr/share/data-prepper/dlq/metrics.dlq
-        index: ss4o_metrics-otel-%{yyyy.MM.dd}
-        bulk_size: 4
-
+        dlq_file: /usr/share/data-prepper/dlq/service-map.dlq
