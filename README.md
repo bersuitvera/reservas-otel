@@ -10,6 +10,8 @@ App -> EDoT Collector -> Elasticsearch -> Kibana
 
 ## Servicios activos (compose único)
 
+El `docker-compose.yml` operativo solo declara servicios de aplicación, PostgreSQL, Redis, Elasticsearch, Kibana y `edot-collector`.
+
 | Servicio | Puerto local | Descripción |
 |---|---:|---|
 | API Gateway | `8080` | Punto de entrada del flujo funcional. |
@@ -84,7 +86,18 @@ Todos los servicios de aplicación publican hacia `edot-collector`:
 
 - Elasticsearch se ejecuta con `xpack.security.enabled=true`.
 - Kibana se autentica contra Elasticsearch con `ELASTICSEARCH_SERVICEACCOUNTTOKEN` (service account `elastic/kibana`), requerido en Elastic 9 para evitar el uso del superusuario `elastic`.
-- Variables de entorno de ejemplo en `.env`.
+- Docker Compose lee las variables desde un `.env` local no versionado.
+
+Variables mínimas esperadas:
+
+```dotenv
+ELASTICSEARCH_USERNAME=elastic
+ELASTIC_PASSWORD=<password-local>
+KIBANA_SERVICE_ACCOUNT_TOKEN=<token-service-account-elastic-kibana>
+KIBANA_ENCRYPTED_SAVED_OBJECTS_KEY=<clave-32-caracteres-o-mas>
+KIBANA_SECURITY_ENCRYPTION_KEY=<clave-32-caracteres-o-mas>
+KIBANA_REPORTING_ENCRYPTION_KEY=<clave-32-caracteres-o-mas>
+```
 
 ## ¿Hace falta APM Server?
 
@@ -111,6 +124,6 @@ curl -s -u elastic:${ELASTIC_PASSWORD} 'http://localhost:9200/.ds-logs-*/_search
 curl -s -u elastic:${ELASTIC_PASSWORD} 'http://localhost:9200/.ds-metrics-*/_search?size=1&sort=@timestamp:desc'
 ```
 
-## Nota sobre OpenSearch en esta rama
+## Nota sobre `observability/`
 
-Los artefactos de OpenSearch/Data Prepper/OTel Collector en `observability/` se conservan como referencia histórica, pero **no están activos** en esta rama ni en el `docker-compose.yml` operativo.
+El directorio `observability/` conserva configuraciones usadas por otras ramas del laboratorio. En esta rama no se activan por estar presentes en esa carpeta: el escenario operativo lo define el `docker-compose.yml`, que levanta Elasticsearch, Kibana y `edot-collector` con `observability/edot-collector/config.yaml`.
