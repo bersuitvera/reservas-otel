@@ -10,7 +10,7 @@ App -> EDoT Collector -> Elasticsearch -> Kibana
 
 ## Servicios activos (compose único)
 
-El `docker-compose.yml` operativo solo declara servicios de aplicación, PostgreSQL, Redis, Elasticsearch, Kibana y `edot-collector`.
+El `docker-compose.yml` operativo solo declara servicios de aplicación, PostgreSQL, Redis, Elasticsearch, Kibana, `kibana-setup` y `edot-collector`.
 
 | Servicio | Puerto local | Descripción |
 |---|---:|---|
@@ -21,6 +21,7 @@ El `docker-compose.yml` operativo solo declara servicios de aplicación, Postgre
 | Notification Service | `8084` | Consumidor de eventos desde Redis Streams. |
 | Elasticsearch | `9200` | Backend de almacenamiento de telemetría OTEL. |
 | Kibana | `5601` | Visualización de trazas, logs y métricas. |
+| Kibana Setup | n/a | Genera el service account token y `kibana.yml`. |
 | EDoT Collector OTLP gRPC | `4317` | Receiver OTLP gRPC. |
 | EDoT Collector OTLP HTTP | `4318` | Receiver OTLP HTTP. |
 | PostgreSQL | `5432` | Persistencia de salas y reservas. |
@@ -85,7 +86,8 @@ Todos los servicios de aplicación publican hacia `edot-collector`:
 ## Seguridad
 
 - Elasticsearch se ejecuta con `xpack.security.enabled=true`.
-- Kibana se autentica contra Elasticsearch con `ELASTICSEARCH_SERVICEACCOUNTTOKEN` (service account `elastic/kibana`), requerido en Elastic 9 para evitar el uso del superusuario `elastic`.
+- `kibana-setup` crea un service account token para `elastic/kibana` con la API de Elasticsearch y genera el `kibana.yml` que usa Kibana.
+- Kibana se autentica contra Elasticsearch con `elasticsearch.serviceAccountToken`, evitando el uso del superusuario `elastic` como usuario interno de Kibana.
 - Docker Compose lee las variables desde un `.env` local no versionado.
 
 Variables mínimas esperadas:
@@ -93,7 +95,6 @@ Variables mínimas esperadas:
 ```dotenv
 ELASTICSEARCH_USERNAME=elastic
 ELASTIC_PASSWORD=<password-local>
-KIBANA_SERVICE_ACCOUNT_TOKEN=<token-service-account-elastic-kibana>
 KIBANA_ENCRYPTED_SAVED_OBJECTS_KEY=<clave-32-caracteres-o-mas>
 KIBANA_SECURITY_ENCRYPTION_KEY=<clave-32-caracteres-o-mas>
 KIBANA_REPORTING_ENCRYPTION_KEY=<clave-32-caracteres-o-mas>

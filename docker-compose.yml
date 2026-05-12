@@ -1,5 +1,6 @@
 volumes:
   elasticsearch-data:
+  kibana-config:
 
 services:
   db:
@@ -40,20 +41,63 @@ services:
       retries: 20
       start_period: 20s
 
-  kibana:
-    image: docker.elastic.co/kibana/kibana:9.3.3
+  kibana-setup:
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.3.3
+    user: root
     environment:
-      ELASTICSEARCH_HOSTS: '["http://elasticsearch:9200"]'
-      ELASTICSEARCH_SERVICEACCOUNTTOKEN: ${KIBANA_SERVICE_ACCOUNT_TOKEN}
-      XPACK_SECURITY_ENABLED: "true"
-      XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY: ${KIBANA_ENCRYPTED_SAVED_OBJECTS_KEY:-reservas-otel-dev-encrypted-saved-objects-key-32}
-      XPACK_SECURITY_ENCRYPTIONKEY: ${KIBANA_SECURITY_ENCRYPTION_KEY:-reservas-otel-dev-security-encryption-key-32}
-      XPACK_REPORTING_ENCRYPTIONKEY: ${KIBANA_REPORTING_ENCRYPTION_KEY:-reservas-otel-dev-reporting-encryption-key-32}
-    ports:
-      - "5601:5601"
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD:-changeme}
+      KIBANA_ENCRYPTED_SAVED_OBJECTS_KEY: ${KIBANA_ENCRYPTED_SAVED_OBJECTS_KEY:-reservas-edot-dev-encrypted-saved-objects-key-32}
+      KIBANA_SECURITY_ENCRYPTION_KEY: ${KIBANA_SECURITY_ENCRYPTION_KEY:-reservas-edot-dev-security-encryption-key-32}
+      KIBANA_REPORTING_ENCRYPTION_KEY: ${KIBANA_REPORTING_ENCRYPTION_KEY:-reservas-edot-dev-reporting-encryption-key-32}
+    command:
+      - bash
+      - -c
+      - |
+        set -euo pipefail
+
+        until curl -s -u "elastic:$${ELASTIC_PASSWORD}" http://elasticsearch:9200/_cluster/health >/dev/null; do
+          sleep 2
+        done
+
+        curl -s -u "elastic:$${ELASTIC_PASSWORD}" \
+          -X DELETE \
+          http://elasticsearch:9200/_security/service/elastic/kibana/credential/token/reservas-kibana >/dev/null || true
+
+        response="$$(curl -s -u "elastic:$${ELASTIC_PASSWORD}" \
+          -X POST \
+          http://elasticsearch:9200/_security/service/elastic/kibana/credential/token/reservas-kibana)"
+        token="$$(printf '%s' "$${response}" | sed -n 's/.*"value":"\([^"]*\)".*/\1/p')"
+
+        if [ -z "$${token}" ]; then
+          printf 'No se pudo crear el service account token de Kibana: %s\n' "$${response}" >&2
+          exit 1
+        fi
+
+        {
+          printf '%s\n' 'server.host: 0.0.0.0'
+          printf '%s\n' 'elasticsearch.hosts: ["http://elasticsearch:9200"]'
+          printf 'elasticsearch.serviceAccountToken: "%s"\n' "$${token}"
+          printf '%s\n' 'monitoring.ui.container.elasticsearch.enabled: true'
+          printf 'xpack.encryptedSavedObjects.encryptionKey: "%s"\n' "$${KIBANA_ENCRYPTED_SAVED_OBJECTS_KEY}"
+          printf 'xpack.security.encryptionKey: "%s"\n' "$${KIBANA_SECURITY_ENCRYPTION_KEY}"
+          printf 'xpack.reporting.encryptionKey: "%s"\n' "$${KIBANA_REPORTING_ENCRYPTION_KEY}"
+        } > /kibana-config/kibana.yml
+        chmod 0644 /kibana-config/kibana.yml
+    volumes:
+      - kibana-config:/kibana-config
     depends_on:
       elasticsearch:
         condition: service_healthy
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:9.3.3
+    ports:
+      - "5601:5601"
+    volumes:
+      - kibana-config:/usr/share/kibana/config:ro
+    depends_on:
+      kibana-setup:
+        condition: service_completed_successfully
 
   edot-collector:
     image: docker.elastic.co/elastic-agent/elastic-otel-collector:9.3.3
