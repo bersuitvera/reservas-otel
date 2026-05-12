@@ -1,6 +1,6 @@
-# Servicios Python (POC Elastic)
+# Aplicación de reservas - servicios Python (POC Elastic)
 
-Este directorio contiene los microservicios FastAPI de la POC y la instrumentación de aplicación con Elastic APM Python Agent.
+Este directorio contiene los microservicios FastAPI de la POC de reservas. En esta rama la instrumentación no usa OpenTelemetry dentro de la aplicación: las trazas y transacciones se generan con Elastic APM Python Agent, mientras que Elastic Agent se encarga de recolectar logs de contenedores y métricas de infraestructura desde Docker.
 
 ## Estructura
 
@@ -11,6 +11,19 @@ Este directorio contiene los microservicios FastAPI de la POC y la instrumentaci
 - `notification-service/`: consumidor asíncrono de eventos.
 - `common/apm.py`: bootstrap compartido de APM.
 - `common/logger.py`: logging ECS JSON.
+
+## Stack de observabilidad usado por la app
+
+```text
+FastAPI services
+  ├── Elastic APM Python Agent -> apm-server:8200 -> Elasticsearch
+  └── stdout ECS JSON logs -----> Elastic Agent ----> Elasticsearch
+
+Docker host / containers -------> Elastic Agent ----> Elasticsearch
+Kibana -------------------------> Elasticsearch
+```
+
+El `docker-compose.yml` de la raíz inyecta las variables `ELASTIC_APM_*` en cada microservicio y monta la configuración standalone de Elastic Agent desde `observability/elastic-agent/elastic-agent.yml`.
 
 ## Arquitectura de ejecución
 
@@ -24,7 +37,7 @@ api-gateway
               └── notification-service (worker XREAD)
 ```
 
-## Instrumentación de aplicación
+## Instrumentación de aplicación con Elastic APM
 
 Todos los servicios inicializan APM con:
 
@@ -36,7 +49,9 @@ Qué hace:
 - registra middleware APM en FastAPI,
 - configura el cliente desde variables `ELASTIC_APM_*`.
 
-## Logging de aplicación
+En esta aplicación, Elastic APM captura automáticamente tráfico HTTP entrante, llamadas HTTPX, operaciones SQLAlchemy y Redis cuando la librería es compatible. Además, `reservation-service` y `notification-service` añaden spans/transacciones manuales de negocio para que la traza represente el flujo real de reserva.
+
+## Logs y métricas con Elastic Agent
 
 `common/logger.py` define `log(level, msg, **fields)` y:
 
@@ -44,7 +59,14 @@ Qué hace:
 - escribe por `stdout`,
 - añade metadatos de servicio para consulta y correlación.
 
-La ingesta de esos logs la realiza Elastic Agent desde logs Docker.
+Elastic Agent no instrumenta el código Python en esta rama. Su papel es operativo:
+
+- leer los logs Docker de los contenedores,
+- decodificar el JSON ECS emitido por la aplicación,
+- enviar logs a Elasticsearch,
+- recolectar métricas de sistema y Docker.
+
+La correlación entre logs y trazas depende de los campos ECS que emiten el logger y el agente APM, como `service.name`, `trace.id` y `span.id`.
 
 ## Servicios
 
@@ -134,6 +156,7 @@ Modelo:
 - worker en hilo daemon,
 - `XREAD` bloqueante,
 - transacción APM por evento procesado.
+- continuación de traza mediante el `traceparent` propagado en el evento Redis.
 
 Span principal:
 

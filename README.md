@@ -10,6 +10,9 @@ Esta rama (`integracion-total-elastic`) prioriza una POC estable y coherente con
 - Trazas y métricas de aplicación con Elastic APM Python Agent.
 - Logs de aplicación en formato ECS JSON.
 - Ingesta de logs de contenedores y métricas de infraestructura con Elastic Agent (standalone).
+- Un único `docker-compose.yml` para aplicación, backend Elastic y agente.
+
+La carpeta `observability/` es compartida con otras ramas y conserva configuraciones de otros backends. En esta rama se usan únicamente `observability/apm-server/apm-server.yml` y `observability/elastic-agent/elastic-agent.yml`.
 
 ## Componentes y puertos
 
@@ -31,28 +34,28 @@ Esta rama (`integracion-total-elastic`) prioriza una POC estable y coherente con
 1. Levantar stack completo:
 
 ```bash
-docker compose -f docker-compose.yml -f docker-compose.elastic.yml up -d --build
+docker compose up -d --build
 ```
 
 2. Parar stack completo:
 
 ```bash
-docker compose -f docker-compose.yml -f docker-compose.elastic.yml down --remove-orphans
+docker compose down --remove-orphans
 ```
 
 3. Ver logs del agente:
 
 ```bash
-docker compose -f docker-compose.yml -f docker-compose.elastic.yml logs -f elastic-agent
+docker compose logs -f elastic-agent
 ```
 
 ## Variables importantes
 
 Archivo `.env`:
 
-- `KIBANA_SERVICE_TOKEN`: token del service account de Kibana.
+- `KIBANA_SERVICE_TOKEN`: token del service account de Kibana, necesario para que Kibana conecte con Elasticsearch.
 
-Variables que inyecta `docker-compose.elastic.yml` en servicios:
+Variables que inyecta `docker-compose.yml` en servicios:
 
 - `ELASTIC_APM_SERVER_URL`
 - `ELASTIC_APM_SERVICE_NAME`
@@ -67,16 +70,17 @@ Credenciales usadas en la POC local:
 
 ## Ficheros de configuración Elastic
 
-### `docker-compose.elastic.yml`
+### `docker-compose.yml`
 
-Define los servicios de observabilidad de la POC:
+Define los servicios funcionales y de observabilidad de la POC:
 
+- microservicios FastAPI, PostgreSQL y Redis,
 - `elasticsearch` con seguridad habilitada.
 - `kibana` autenticado mediante `ELASTICSEARCH_SERVICEACCOUNTTOKEN`.
 - `apm-server` para intake de agentes APM Python.
 - `elastic-agent` standalone para logs de contenedor y métricas de infraestructura.
 
-Además sobreescribe variables de cada microservicio para activar APM.
+Además inyecta variables `ELASTIC_APM_*` en cada microservicio para activar APM contra `apm-server:8200`.
 
 ### `observability/apm-server/apm-server.yml`
 
@@ -174,9 +178,9 @@ pytest -q services/tests
 
 ## Troubleshooting rápido
 
-- Si `down` no para todo, usar ambos archivos compose y `--remove-orphans`.
+- Si `down` deja contenedores antiguos de pruebas previas, usar `docker compose down --remove-orphans`.
 - Si Kibana no arranca, revisar `KIBANA_SERVICE_TOKEN` en `.env`.
 - Si no ves logs, revisar:
-  - `docker compose ... logs elastic-agent`
+  - `docker compose logs elastic-agent`
   - montaje `/var/lib/docker/containers` en `elastic-agent`
   - que la app esté emitiendo logs en JSON ECS.

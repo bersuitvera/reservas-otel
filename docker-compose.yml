@@ -1,3 +1,12 @@
+volumes:
+  elasticsearch-data:
+
+x-elastic-apm-env: &elastic-apm-env
+  ELASTIC_APM_SERVER_URL: http://apm-server:8200
+  ELASTIC_APM_ENVIRONMENT: dev
+  ELASTIC_APM_SERVICE_VERSION: 0.1.0
+  ELASTIC_APM_ENABLE_LOG_CORRELATION: "true"
+
 services:
   db:
     image: postgres:16-alpine
@@ -18,6 +27,70 @@ services:
     ports:
       - "6379:6379"
 
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.3.3
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: "true"
+      xpack.security.http.ssl.enabled: "false"
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD:-changeme}
+      ES_JAVA_OPTS: -Xms512m -Xmx512m
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s -u elastic:${ELASTIC_PASSWORD:-changeme} http://localhost:9200/_cluster/health >/dev/null 2>&1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:9.3.3
+    environment:
+      ELASTICSEARCH_HOSTS: '["http://elasticsearch:9200"]'
+      ELASTICSEARCH_SERVICEACCOUNTTOKEN: ${KIBANA_SERVICE_TOKEN:-}
+      XPACK_SECURITY_ENABLED: "true"
+      XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY: ${KIBANA_ENCRYPTED_SAVED_OBJECTS_KEY:-reservas-elastic-dev-encrypted-saved-objects-key-32}
+      XPACK_SECURITY_ENCRYPTIONKEY: ${KIBANA_SECURITY_ENCRYPTION_KEY:-reservas-elastic-dev-security-encryption-key-32}
+      XPACK_REPORTING_ENCRYPTIONKEY: ${KIBANA_REPORTING_ENCRYPTION_KEY:-reservas-elastic-dev-reporting-encryption-key-32}
+    ports:
+      - "5601:5601"
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+
+  apm-server:
+    image: docker.elastic.co/apm/apm-server:9.3.3
+    command: ["--strict.perms=false", "-e"]
+    environment:
+      ELASTICSEARCH_USERNAME: ${ELASTICSEARCH_USERNAME:-elastic}
+      ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD:-changeme}
+    volumes:
+      - ./observability/apm-server/apm-server.yml:/usr/share/apm-server/apm-server.yml:ro
+    ports:
+      - "8200:8200"
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+
+  elastic-agent:
+    image: docker.elastic.co/elastic-agent/elastic-agent:9.3.3
+    command: ["elastic-agent", "run", "-e", "-c", "/usr/share/elastic-agent/elastic-agent.yml"]
+    user: root
+    environment:
+      FLEET_ENROLL: "0"
+      ELASTICSEARCH_USERNAME: ${ELASTICSEARCH_USERNAME:-elastic}
+      ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD:-changeme}
+    volumes:
+      - ./observability/elastic-agent/elastic-agent.yml:/usr/share/elastic-agent/elastic-agent.yml:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+
   room-service:
     build:
       context: ./services
@@ -25,7 +98,9 @@ services:
       args:
         SERVICE_NAME: room-service
     environment:
+      <<: *elastic-apm-env
       SERVICE_NAME: room-service
+      ELASTIC_APM_SERVICE_NAME: room-service
       DATABASE_URL: postgresql+psycopg://user:password@db:5432/reservas_db
       STARTUP_SEED: "true"
     ports:
@@ -33,6 +108,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      apm-server:
+        condition: service_started
 
   user-service:
     build:
@@ -41,9 +118,14 @@ services:
       args:
         SERVICE_NAME: user-service
     environment:
+      <<: *elastic-apm-env
       SERVICE_NAME: user-service
+      ELASTIC_APM_SERVICE_NAME: user-service
     ports:
       - "8082:8000"
+    depends_on:
+      apm-server:
+        condition: service_started
 
   reservation-service:
     build:
@@ -52,7 +134,9 @@ services:
       args:
         SERVICE_NAME: reservation-service
     environment:
+      <<: *elastic-apm-env
       SERVICE_NAME: reservation-service
+      ELASTIC_APM_SERVICE_NAME: reservation-service
       DATABASE_URL: postgresql+psycopg://user:password@db:5432/reservas_db
       REDIS_URL: redis://redis:6379/0
       ROOM_SERVICE_URL: http://room-service:8000
@@ -63,6 +147,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
+      apm-server:
+        condition: service_started
 
   notification-service:
     build:
@@ -71,12 +157,16 @@ services:
       args:
         SERVICE_NAME: notification-service
     environment:
+      <<: *elastic-apm-env
       SERVICE_NAME: notification-service
+      ELASTIC_APM_SERVICE_NAME: notification-service
       REDIS_URL: redis://redis:6379/0
     ports:
       - "8084:8000"
     depends_on:
       redis:
+        condition: service_started
+      apm-server:
         condition: service_started
 
   api-gateway:
@@ -86,15 +176,21 @@ services:
       args:
         SERVICE_NAME: api-gateway
     environment:
+      <<: *elastic-apm-env
       SERVICE_NAME: api-gateway
+      ELASTIC_APM_SERVICE_NAME: api-gateway
       ROOM_SERVICE_URL: http://room-service:8000
       RESERVATION_SERVICE_URL: http://reservation-service:8000
       USER_SERVICE_URL: http://user-service:8000
     ports:
       - "8080:8000"
     depends_on:
-      - room-service
-      - reservation-service
+      room-service:
+        condition: service_started
+      reservation-service:
+        condition: service_started
+      apm-server:
+        condition: service_started
 
 # Comando útil:
-#   docker compose -f docker-compose.yml -f docker-compose.elastic.yml up -d --build
+#   docker compose up -d --build
