@@ -51,9 +51,7 @@ docker compose logs -f elastic-agent
 
 ## Variables importantes
 
-Archivo `.env`:
-
-- `KIBANA_SERVICE_TOKEN`: token del service account de Kibana, necesario para que Kibana conecte con Elasticsearch.
+El `docker-compose.yml` incluye un servicio `kibana-setup` que crea automáticamente el service account token de Kibana en Elasticsearch y genera el `kibana.yml` que consume el contenedor `kibana`.
 
 Variables que inyecta `docker-compose.yml` en servicios:
 
@@ -76,7 +74,8 @@ Define los servicios funcionales y de observabilidad de la POC:
 
 - microservicios FastAPI, PostgreSQL y Redis,
 - `elasticsearch` con seguridad habilitada.
-- `kibana` autenticado mediante `ELASTICSEARCH_SERVICEACCOUNTTOKEN`.
+- `kibana-setup`, que crea el token de service account y escribe la configuración de Kibana.
+- `kibana`, autenticado contra Elasticsearch con el token generado.
 - `apm-server` para intake de agentes APM Python.
 - `elastic-agent` standalone para logs de contenedor y métricas de infraestructura.
 
@@ -179,7 +178,7 @@ pytest -q services/tests
 ## Troubleshooting rápido
 
 - Si `down` deja contenedores antiguos de pruebas previas, usar `docker compose down --remove-orphans`.
-- Si Kibana no arranca, revisar `KIBANA_SERVICE_TOKEN` en `.env`.
+- Si Kibana muestra errores de credenciales, recrear `kibana-setup` y `kibana`: `docker compose up -d --force-recreate kibana-setup kibana`.
 - Si no ves logs, revisar:
   - `docker compose logs elastic-agent`
   - montaje `/var/lib/docker/containers` en `elastic-agent`
