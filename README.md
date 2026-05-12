@@ -1,6 +1,8 @@
 # Sistema de Reservas - Microservicios
 
-Proyecto de ejemplo con microservicios en Python/FastAPI para gestión de salas, usuarios, reservas y notificaciones, con trazabilidad distribuida en OpenSearch usando OpenTelemetry Collector y Data Prepper.
+Proyecto de ejemplo con microservicios en Python/FastAPI para gestión de salas, usuarios, reservas y notificaciones, con instrumentación OpenTelemetry, Data Prepper + OpenSearch para trazas/logs y Prometheus para métricas.
+
+Esta rama corresponde al entorno `instrumentación + OTel Collector + Data Prepper/OpenSearch + Prometheus`. La carpeta `observability/` se comparte con otros entornos, así que `docker-compose.yml` fija aquí las piezas que necesita esta variante.
 
 ## Servicios
 
@@ -11,14 +13,14 @@ Proyecto de ejemplo con microservicios en Python/FastAPI para gestión de salas,
 | User Service | `8082` | Consulta básica de usuarios. |
 | Reservation Service | `8083` | Disponibilidad y creación de reservas. |
 | Notification Service | `8084` | Consumidor de eventos desde Redis Streams. |
-| OpenSearch API | `9200` | Almacenamiento y consulta de telemetría. |
+| OpenSearch API | `9200` | Almacenamiento y consulta de telemetría por HTTPS. |
 | OpenSearch Dashboards | `5601` | Visualización de trazas, logs y métricas. |
 | Prometheus | `9090` | Almacenamiento de métricas OTLP + RED metrics de APM v2. |
 | OpenSearch Exporter | `9114` | Métricas de OpenSearch para scraping en Prometheus. |
 | Data Prepper OTLP gRPC | `21890` | Entrada OTLP para trazas/logs desde OTel Collector. |
 | Data Prepper API | `4900` | Estado operativo de pipelines. |
-| OTel Collector OTLP gRPC | `4317` | Receiver OTLP gRPC desde servicios. |
-| OTel Collector OTLP HTTP | `4318` | Receiver OTLP HTTP desde servicios. |
+| OTel Collector OTLP gRPC | `4317` | Receiver OTLP gRPC disponible. |
+| OTel Collector OTLP HTTP | `4318` | Receiver OTLP HTTP usado por los servicios. |
 | OTel Collector Metrics | `8888` | Métricas internas del collector (Prometheus scrape). |
 | PostgreSQL | `5432` | Persistencia de salas y reservas. |
 | Redis | `6379` | Bus de eventos para notificaciones. |
@@ -39,7 +41,7 @@ Proyecto de ejemplo con microservicios en Python/FastAPI para gestión de salas,
 ```text
 [Microservicios FastAPI]
     |
-    | OTLP HTTP/gRPC (4318/4317)
+    | OTLP HTTP (4318)
     v
 [OTel Collector]
     |---- TRACE/LOG -> OTLP gRPC (21890) -> Data Prepper
@@ -51,6 +53,7 @@ Proyecto de ejemplo con microservicios en Python/FastAPI para gestión de salas,
 Data Prepper:
   - traces-raw-pipeline -> OpenSearch (spans)
   - service-map-pipeline (otel_apm_service_map) -> OpenSearch + Prometheus
+  - service-map-legacy-pipeline -> OpenSearch (Trace Analytics legacy)
   - logs-pipeline -> OpenSearch
 
 OpenSearch -> OpenSearch Dashboards
@@ -197,7 +200,7 @@ docker compose up -d --build
 Solo observabilidad:
 
 ```bash
-docker compose up -d --force-recreate opensearch opensearch-dashboards data-prepper otel-collector prometheus opensearch-exporter
+docker compose up -d --force-recreate opensearch prometheus data-prepper otel-collector opensearch-exporter opensearch-dashboards opensearch-dashboards-init
 ```
 
 ## Smoke test E2E
@@ -261,9 +264,10 @@ En Trace Analytics, tras ejecutar el smoke test:
 
 En índices:
 
-- Trazas: `otel-v1-apm-span-*`
+- Trazas: `otel-v1-apm-span*`
 - Service map (APM v2): `otel-v2-apm-service-map*`
-- Logs: `logs-otel-*`
+- Service map legacy: `otel-v1-apm-service-map*`
+- Logs: `logs-otel-v1*`
 - Métricas: en Prometheus (UI y PromQL en `http://localhost:9090`)
 
 ## Endpoints principales
@@ -280,7 +284,7 @@ En índices:
 - Prometheus: `http://localhost:9090`
 - OpenSearch Exporter metrics: `http://localhost:9114/metrics`
 - OTel Collector internal metrics: `http://localhost:8888/metrics`
-- OpenSearch: `http://localhost:9200`
+- OpenSearch: `https://localhost:9200` (`admin` / `ChangeMe_123!`, usar `-k` con `curl`)
 - OpenSearch Dashboards: `http://localhost:5601`
 
 ## Documentación interna de servicios
@@ -290,6 +294,7 @@ En índices:
 
 ## Notas operativas
 
+- La contraseña de OpenSearch de esta rama es `ChangeMe_123!`, alineada con los ficheros compartidos montados desde `observability/`.
 - Si cambias estructura de spans/atributos y aparecen errores de parseo por mapping en trazas, recrea volumen/índices:
 
 ```bash
