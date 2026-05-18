@@ -107,7 +107,8 @@ def create(payload: dict):
         if DB_LAT_MS:
             time.sleep(DB_LAT_MS / 1000)
 
-        with tracer.start_as_current_span("reservation.check.availability", kind=SpanKind.INTERNAL):
+        with tracer.start_as_current_span("reservation.check.availability", kind=SpanKind.INTERNAL) as availability_span:
+            availability_span.set_attribute("app_room_id", room_id)
             with engine.begin() as conn:
                 overlap = conn.execute(text("""
                   SELECT COUNT(*) FROM reservations
@@ -115,10 +116,15 @@ def create(payload: dict):
                     AND status = 'CONFIRMED'
                     AND (start_ts < :end_ts) AND (end_ts > :start_ts)
                 """), {"room_id": room_id, "start_ts": s, "end_ts": e}).scalar_one()
+                availability_span.set_attribute("app_overlap_count", overlap)
 
                 if overlap > 0:
                     reservation_conflict_counter.add(1, {"room_id": room_id})
-                    span.add_event("reservation.conflict", {"app_room_id": room_id})
+                    availability_span.add_event("reservation.conflict", {
+                        "app_room_id": room_id,
+                        "app_user_id": user_id,
+                        "app_overlap_count": overlap,
+                    })
                     log("warn", "reservation conflict", room_id=room_id, user_id=user_id)
                     raise HTTPException(409, "time slot not available")
 
