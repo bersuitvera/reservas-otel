@@ -15,9 +15,9 @@ Pasos necesarios para una inicializacion correcta:
    `data_source.enabled`, `explore.enabled`, `explore.discoverTraces.enabled`,
    `explore.discoverMetrics.enabled` y `datasetManagement.enabled` activados en
    `observability/opensearch-dashboards/opensearch_dashboards.yml`.
-3. El workspace indicado por `OPENSEARCH_WORKSPACE_NAME` debe existir antes de
-   ejecutar este script. Si no existe, el bootstrap se omite para no crear
-   objetos en un contexto incorrecto.
+3. El workspace indicado por `OPENSEARCH_WORKSPACE_NAME` se crea si no existe,
+   y despues se usan sus APIs scoped (`/w/{workspace_id}/...`) para crear los
+   objetos de Discover/APM.
 4. Prometheus debe ser resoluble desde el contenedor init mediante
    `PROMETHEUS_HOST` y `PROMETHEUS_PORT` para que la conexion Direct Query pueda
    apuntar al endpoint correcto.
@@ -51,6 +51,8 @@ WORKSPACE_NAME = os.getenv("OPENSEARCH_WORKSPACE_NAME", "reservas_app")
 OPENSEARCH_ENDPOINT = os.getenv("OPENSEARCH_ENDPOINT", "https://opensearch:9200")
 PROMETHEUS_HOST = os.getenv("PROMETHEUS_HOST", "prometheus")
 PROMETHEUS_PORT = os.getenv("PROMETHEUS_PORT", "9090")
+WORKSPACE_FEATURES = ["use-case-observability"]
+WORKSPACE_DESCRIPTION = "Reservas observability workspace"
 
 JSON_HEADERS = {
     "Content-Type": "application/json",
@@ -125,13 +127,12 @@ def wait_for_dashboards():
     return False
 
 
-def get_workspace_id():
-    """Obtiene el ID del workspace configurado en `OPENSEARCH_WORKSPACE_NAME`.
+def get_or_create_workspace_id():
+    """Obtiene o crea el workspace configurado en `OPENSEARCH_WORKSPACE_NAME`.
 
     Las APIs de objetos guardados que se usan para Discover/APM son scoped al
     workspace (`/w/{workspace_id}/...`). Si la API de workspaces no esta
-    disponible o el workspace no existe, se devuelve `None` y el bootstrap se
-    detiene.
+    disponible, se devuelve `None` y el bootstrap se detiene.
     """
     status, body = _request("POST", "/api/workspaces/_list", {})
     if status != 200:
@@ -141,10 +142,45 @@ def get_workspace_id():
     workspaces = body.get("result", {}).get("workspaces", [])
     for ws in workspaces:
         if ws.get("name") == WORKSPACE_NAME:
-            return ws.get("id")
+            workspace_id = ws.get("id")
+            print(f"Workspace already exists: {WORKSPACE_NAME} ({workspace_id})")
+            ensure_observability_workspace(workspace_id, ws.get("features", []))
+            return workspace_id
 
-    print(f"Workspace '{WORKSPACE_NAME}' not found, skipping workspace bootstrap")
+    payload = {
+        "attributes": {
+            "name": WORKSPACE_NAME,
+            "description": WORKSPACE_DESCRIPTION,
+            "features": WORKSPACE_FEATURES,
+        }
+    }
+    status, body = _request("POST", "/api/workspaces", payload)
+    if status == 200:
+        workspace_id = body.get("result", {}).get("id")
+        print(f"Created workspace: {WORKSPACE_NAME} ({workspace_id})")
+        return workspace_id
+
+    print(f"Failed creating workspace '{WORKSPACE_NAME}': status={status}, body={body}")
     return None
+
+
+def ensure_observability_workspace(workspace_id, current_features):
+    """Corrige workspaces creados con otro use case, por ejemplo Analytics."""
+    if current_features == WORKSPACE_FEATURES:
+        return
+
+    payload = {
+        "attributes": {
+            "name": WORKSPACE_NAME,
+            "description": WORKSPACE_DESCRIPTION,
+            "features": WORKSPACE_FEATURES,
+        }
+    }
+    status, body = _request("PUT", f"/api/workspaces/{workspace_id}", payload)
+    if status == 200:
+        print(f"Workspace use case set to Observability: {WORKSPACE_NAME} ({workspace_id})")
+    else:
+        print(f"Failed updating workspace use case: status={status}, body={body}")
 
 
 def find_saved_object(workspace_id, obj_type, title):
@@ -449,7 +485,7 @@ def main():
     if not wait_for_dashboards():
         return
 
-    workspace_id = get_workspace_id()
+    workspace_id = get_or_create_workspace_id()
     if not workspace_id:
         return
 
