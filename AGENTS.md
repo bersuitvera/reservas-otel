@@ -56,6 +56,18 @@ Por tanto:
 nombre de rama + README.md + docker-compose.yml
 ```
 
+## Definición de terminado
+
+Una tarea solo se considera terminada cuando el agente ha indicado:
+
+1. Rama activa detectada.
+2. Escenario identificado.
+3. Archivos modificados.
+4. Motivo de cada cambio.
+5. Comandos ejecutados.
+6. Resultado de tests o validaciones.
+7. Evidencias pendientes, si no se han podido comprobar visualmente.
+
 ---
 
 ## Escenario A: OpenSearch OTel-native
@@ -564,3 +576,18 @@ No mezcles escenarios.
 No simplifiques perdiendo valor didáctico.
 
 Primero identifica el escenario. Después modifica.
+
+
+
+
+## Formato de respuesta esperado
+
+Al finalizar una intervención, responder siempre con:
+
+- Escenario detectado.
+- Cambios realizados.
+- Archivos modificados.
+- Validaciones ejecutadas.
+- Riesgos o comprobaciones pendientes.
+
+No afirmar que algo funciona si no se ha probado.
