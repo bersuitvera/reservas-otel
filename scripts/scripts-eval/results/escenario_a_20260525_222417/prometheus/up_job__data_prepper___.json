@@ -1,0 +1,1 @@
+{"status":"success","data":{"resultType":"vector","result":[{"metric":{"__name__":"up","component":"telemetry-processing","instance":"data-prepper:4900","job":"data-prepper","service":"data-prepper"},"value":[1779741289.254,"1"]}]}}

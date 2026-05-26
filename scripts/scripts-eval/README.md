@@ -1,108 +1,116 @@
 # Scripts auxiliares para la evaluación experimental del capítulo 7
 
-Estos scripts ayudan a recoger datos comparables durante las pruebas con Locust.
+Estos scripts recogen datos comparables durante pruebas con Locust en las tres
+ramas del laboratorio. La misma carpeta `scripts/scripts-eval` debe existir en
+los escenarios A, B y C.
 
-La idea de uso es:
+## Detección automática
 
-1. Levantar un escenario concreto del repositorio.
-2. Verificar que el API Gateway responde en `http://localhost:8080/health`.
-3. Revisar `scripts/scripts-eval/.env`.
-4. Ejecutar `scripts/scripts-eval/run_experiment.sh`.
-5. Analizar los CSV/JSON generados en `scripts/scripts-eval/results/<escenario>_<timestamp>/`.
+Los scripts detectan la rama activa y cargan defaults versionados:
 
-Todos los scripts Bash de esta carpeta cargan `scripts/scripts-eval/.env` al
-arrancar. Si una variable ya está exportada en la shell, esa variable tiene
-prioridad sobre el valor del `.env`.
+| Rama | Escenario | Backend | Stack |
+|---|---|---|---|
+| `otel-collector` | `escenario_a` | OpenSearch | OTel Collector + Data Prepper + Prometheus |
+| `feat-edot-elasticsearch-dual-stack` | `escenario_b` | Elasticsearch | EDoT Collector |
+| `integracion-total-elastic` | `escenario_c` | Elasticsearch | Elastic APM Server + Elastic Agent |
 
-## Scripts incluidos
+Defaults versionados:
 
-| Script | Función |
-|---|---|
-| `run_experiment.sh` | Orquesta una prueba completa: lanza Locust, muestrea `docker stats`, espera el vaciado del pipeline y recoge índices/data streams. |
-| `monitor_docker_stats.sh` | Muestrea CPU/RAM de contenedores durante la prueba y genera JSONL bruto. |
-| `summarize_docker_stats.py` | Convierte el JSONL de Docker en CSV de muestras y CSV resumen. |
-| `collect_indices.sh` | Consulta OpenSearch/Elasticsearch mediante APIs REST y guarda índices, data streams, conteos y estado del clúster. |
-| `summarize_indices.py` | Genera CSV resumen de tamaño en disco y documentos indexados. |
-| `collect_prometheus_snapshot.sh` | Opcional para Escenario A: lanza consultas instantáneas a Prometheus. |
-| `.env` | Variables comunes de evaluación. Se carga automáticamente por el runner y auxiliares. |
-| `eval_env.sh` | Carga común del `.env` y resolución estable de rutas. |
+```text
+scripts/scripts-eval/env/escenario_a.env
+scripts/scripts-eval/env/escenario_b.env
+scripts/scripts-eval/env/escenario_c.env
+```
+
+El fichero `scripts/scripts-eval/.env` es opcional, local e ignorado por git.
+Sirve para sobrescribir valores como `USERS`, `RUN_TIME`, `ELASTIC_PASSWORD` o
+`ENGINE_PASS`. Las variables ya exportadas en la shell tienen prioridad sobre
+los defaults y sobre `.env`.
 
 ## Uso básico
 
-Desde la raíz del repositorio, con el stack ya levantado:
+Desde la raíz del repositorio, con el stack del escenario ya levantado:
 
 ```bash
 scripts/scripts-eval/run_experiment.sh
 ```
 
-El escenario por defecto está definido en `.env` como `SCENARIO=escenario_a`.
-También puedes sobrescribir valores puntuales sin editar el fichero:
+También se puede forzar un escenario explícitamente:
 
 ```bash
-USERS=100 RUN_TIME=20m scripts/scripts-eval/run_experiment.sh escenario_a
-```
-
-## Ejemplo por escenario
-
-### Escenario A: OpenSearch OTel-native
-
-```bash
-scripts/scripts-eval/run_experiment.sh escenario_a
-```
-
-El `.env` incluido ya usa los valores esperados para esta rama:
-`ENGINE_URL=https://localhost:9200`, credenciales `admin/ChangeMe_123!`,
-`ENGINE_INSECURE=true`, `PROMETHEUS_URL=http://localhost:9090` y filtro de
-contenedores para microservicios, PostgreSQL, Redis, OTel Collector, Data Prepper,
-OpenSearch, OpenSearch Dashboards, Prometheus y exporter.
-
-### Escenario B: Elastic híbrido con EDOT
-
-```bash
-export ENGINE_URL="http://localhost:9200"
-export CONTAINER_REGEX="edot|elasticsearch|kibana"
-
 scripts/scripts-eval/run_experiment.sh escenario_b
 ```
 
-Si Elasticsearch usa autenticación:
+O sobrescribir valores puntuales:
 
 ```bash
-export ENGINE_URL="https://localhost:9200"
-export ENGINE_USER="elastic"
-export ENGINE_PASS="TU_PASSWORD"
-export ENGINE_INSECURE="true"
+USERS=100 RUN_TIME=20m scripts/scripts-eval/run_experiment.sh
 ```
 
-### Escenario C: Elastic integrado
+## Scripts incluidos
 
-```bash
-export ENGINE_URL="http://localhost:9200"
-export CONTAINER_REGEX="elasticsearch|kibana|apm|elastic-agent"
-
-scripts/scripts-eval/run_experiment.sh escenario_c
-```
+| Script | Función |
+|---|---|
+| `run_experiment.sh` | Orquesta Locust, `docker stats`, espera de vaciado e ingesta final. |
+| `monitor_docker_stats.sh` | Muestrea CPU/RAM de contenedores y genera JSONL bruto. |
+| `summarize_docker_stats.py` | Convierte el JSONL de Docker en CSV de muestras y resumen. |
+| `collect_indices.sh` | Consulta OpenSearch/Elasticsearch y guarda evidencias comunes/específicas. |
+| `summarize_indices.py` | Genera CSV resumen de tamaño en disco y documentos indexados. |
+| `summarize_backend_health.py` | Genera checks PASS/WARN/FAIL a partir de salud, stats e índices del backend. |
+| `collect_prometheus_snapshot.sh` | Solo Escenario A: consultas instantáneas a Prometheus. |
+| `summarize_prometheus_snapshot.py` | Resume targets, colas, fallos de exportación y métricas de ingesta Prometheus. |
+| `eval_env.sh` | Detección de rama, carga de defaults y resolución estable de rutas. |
 
 ## Variables principales
 
-| Variable | Valor por defecto | Descripción |
-|---|---:|---|
-| `SCENARIO` | `escenario_a` | Nombre metodológico del escenario si no se pasa argumento al runner. |
-| `HOST` | `http://localhost:8080` | URL del API Gateway usada por Locust y el preflight. |
-| `USERS` | `50` | Usuarios concurrentes de Locust. |
-| `SPAWN_RATE` | `5` | Usuarios creados por segundo. |
-| `RUN_TIME` | `10m` | Duración de la prueba. |
-| `SAMPLE_INTERVAL` | `5` | Frecuencia de muestreo de `docker stats`, en segundos. |
-| `POST_RUN_SLEEP` | `30` | Espera final para permitir que collectors/APM Server indexen datos pendientes. |
-| `OUT_ROOT` | `results` | Directorio raíz de salida. Si es relativo, se resuelve contra `scripts/scripts-eval`. |
-| `LOCUSTFILE` | `locustfile.py` | Ruta del `locustfile.py`. Si es relativa, se resuelve contra `scripts/scripts-eval`. |
-| `CONTAINER_REGEX` | escenario A | Filtro opcional sobre nombres de contenedores. Vacío muestrea todos. |
-| `ENGINE_URL` | `https://localhost:9200` | URL de OpenSearch o Elasticsearch. |
-| `ENGINE_USER` | `admin` | Usuario si el motor requiere autenticación. |
-| `ENGINE_PASS` | `ChangeMe_123!` | Contraseña si el motor requiere autenticación. |
-| `ENGINE_INSECURE` | `true` | Añade `-k` a curl para certificados autofirmados. |
-| `PROMETHEUS_URL` | `http://localhost:9090` | URL de Prometheus para Escenario A. |
-| `EVAL_ENV_FILE` | `scripts/scripts-eval/.env` | Ruta alternativa de configuración dotenv. |
+| Variable | Descripción |
+|---|---|
+| `SCENARIO` | Escenario activo. Se detecta desde la rama salvo override explícito. |
+| `HOST` | URL del API Gateway usada por Locust y el preflight. |
+| `USERS` | Usuarios concurrentes de Locust. |
+| `SPAWN_RATE` | Usuarios creados por segundo. |
+| `RUN_TIME` | Duración de la prueba. |
+| `SAMPLE_INTERVAL` | Frecuencia de muestreo de `docker stats`, en segundos. |
+| `POST_RUN_SLEEP` | Espera final para permitir indexación de telemetría pendiente. |
+| `OUT_ROOT` | Directorio raíz de salida, relativo a `scripts/scripts-eval` si no es absoluto. |
+| `LOCUSTFILE` | Ruta del `locustfile.py`. |
+| `CONTAINER_REGEX` | Filtro de contenedores para `docker stats`. |
+| `ENGINE_URL` | URL de OpenSearch o Elasticsearch. |
+| `ENGINE_USER` | Usuario del backend si requiere autenticación. |
+| `ENGINE_PASS` | Contraseña del backend. En B/C usa `${ELASTIC_PASSWORD:-changeme}` por defecto. |
+| `ENGINE_INSECURE` | Añade `-k` a curl si vale `true`. |
+| `PROMETHEUS_URL` | Solo Escenario A. Vacío en B/C para omitir Prometheus. |
+
+## Evidencias recogidas
+
+Siempre se guardan:
+
+```text
+engine_root.json
+cluster_health.json
+cluster_stats.json
+nodes_stats.json
+indices_stats.json
+indices.json
+count.json
+templates.json
+shards.json
+nodes.json
+allocation.json
+thread_pool.json
+indices_summary.csv
+indices_total.csv
+backend_health_summary.csv
+backend_health_summary.json
+metadata.env
+```
+
+Además:
+
+- Escenario A: índices `otel-v1-apm-*`, `logs-otel-v1-*` y service map. No consulta `/_cat/data_streams` porque esta variante usa índices OpenSearch para la telemetría.
+- Escenario B: backing indices/data streams `.ds-traces-*`, `.ds-logs-*`, `.ds-metrics-*`.
+- Escenario C: `traces-apm*`, `metrics-apm*`, `logs-containerlogs-*`, `metrics-system.*`, `metrics-docker.*`.
+- Escenario A con `PROMETHEUS_URL`: snapshot de métricas Prometheus en `prometheus/`, incluyendo OTel Collector, Data Prepper, OpenSearch exporter y `prometheus_summary.csv/json`.
 
 ## Salidas generadas
 
@@ -111,6 +119,7 @@ Cada ejecución crea un directorio similar a:
 ```text
 scripts/scripts-eval/results/escenario_a_20260524_120000/
 ├── metadata.env
+├── gateway_health.json
 ├── locust_stats.csv
 ├── locust_failures.csv
 ├── locust_exceptions.csv
@@ -122,19 +131,25 @@ scripts/scripts-eval/results/escenario_a_20260524_120000/
 ├── data_streams.json
 ├── count.json
 ├── cluster_health.json
+├── cluster_stats.json
+├── nodes_stats.json
+├── indices_stats.json
 ├── indices_summary.csv
 ├── indices_total.csv
+├── backend_health_summary.csv
 └── prometheus/
 ```
 
 ## Nota metodológica
 
-El `HTTP 409` generado por el flujo de conflicto controlado debe interpretarse como error funcional esperado, no como fallo técnico. En Locust se identifica mediante el nombre:
+El `HTTP 409` generado por el flujo de conflicto controlado debe interpretarse
+como error funcional esperado, no como fallo técnico. En Locust se identifica
+mediante:
 
 ```text
 POST /reservations [409 esperado]
 ```
 
-Para el análisis del TFG conviene separar:
-- errores esperados: `409` inducidos deliberadamente;
-- errores no esperados: `5xx`, timeouts, conexiones fallidas o `409` fuera del flujo de conflicto.
+Para el análisis conviene separar errores esperados (`409` inducidos) de errores
+no esperados (`5xx`, timeouts, conexiones fallidas o conflictos fuera del flujo
+controlado).

@@ -1,0 +1,17 @@
+index,health,status,docs_count,store_size_mb,pri_store_size_mb
+.kibana_1,green,open,14,0.0,0.0
+.opendistro-job-scheduler-lock,green,open,6,0.0,0.0
+.opendistro_security,green,open,9,0.0,0.0
+.plugins-ml-config,green,open,1,0.0,0.0
+.ql-datasources,green,open,1,0.0,0.0
+logs-otel-v1-000001,yellow,open,344835,83.0,83.0
+logs-otel-v1-000002,yellow,open,208227,58.0,58.0
+otel-v1-apm-service-map,yellow,open,37,0.0,0.0
+otel-v1-apm-span-000001,yellow,open,2339294,767.0,767.0
+otel-v1-apm-span-000002,yellow,open,1415828,942.0,942.0
+otel-v2-apm-service-map-000001,yellow,open,288947,10.0,10.0
+otel-v2-apm-service-map-000002,yellow,open,96973,5.0,5.0
+security-auditlog-2026.05.24,green,open,283,0.0,0.0
+security-auditlog-2026.05.25,green,open,151,0.0,0.0
+top_queries-2026.05.24-84959,green,open,123,0.0,0.0
+top_queries-2026.05.25-84960,green,open,36,0.0,0.0

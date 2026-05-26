@@ -1,0 +1,1 @@
+{"status":"success","data":{"resultType":"vector","result":[{"metric":{"__name__":"up","component":"search-storage","instance":"opensearch-exporter:9114","job":"opensearch","service":"opensearch"},"value":[1779741289.276,"1"]}]}}

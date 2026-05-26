@@ -26,6 +26,7 @@ echo "[INFO] monitor_docker_stats: salida=${OUT_FILE}, intervalo=${INTERVAL}s" >
 
 while true; do
   TS="$(date -Iseconds)"
+  FILTERED_CONTAINERS=()
 
   if [[ -n "${CONTAINERS:-}" ]]; then
     read -r -a CONTAINER_LIST <<< "${CONTAINERS}"
@@ -42,13 +43,18 @@ while true; do
       fi
     fi
 
-    # docker stats puede fallar si un contenedor desaparece justo en ese instante.
-    docker stats --no-stream --format '{{json .}}' "$NAME" 2>/dev/null \
+    FILTERED_CONTAINERS+=("$NAME")
+  done
+
+  if [[ ${#FILTERED_CONTAINERS[@]} -gt 0 ]]; then
+    # One docker stats call per cycle keeps SAMPLE_INTERVAL meaningful even with
+    # many containers in the scenario.
+    docker stats --no-stream --format '{{json .}}' "${FILTERED_CONTAINERS[@]}" 2>/dev/null \
       | while IFS= read -r LINE; do
           [[ -z "$LINE" ]] && continue
           printf '{"ts":"%s","stats":%s}\n' "$TS" "$LINE" >> "$OUT_FILE"
         done || true
-  done
+  fi
 
   sleep "$INTERVAL"
 done

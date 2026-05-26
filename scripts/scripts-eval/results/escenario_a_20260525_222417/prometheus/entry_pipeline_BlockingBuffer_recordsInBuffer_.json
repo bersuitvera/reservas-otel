@@ -1,0 +1,1 @@
+{"status":"success","data":{"resultType":"vector","result":[{"metric":{"__name__":"entry_pipeline_BlockingBuffer_recordsInBuffer","component":"telemetry-processing","instance":"data-prepper:4900","job":"data-prepper","service":"data-prepper","serviceName":"dataprepper"},"value":[1779741289.690,"0"]}]}}

@@ -2,12 +2,17 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-# Carga siempre scripts/scripts-eval/.env antes de resolver valores por defecto.
-# Las variables ya exportadas por el usuario tienen prioridad sobre el .env.
+
+if [[ $# -gt 0 && -n "${1:-}" ]]; then
+  export SCENARIO="$1"
+fi
+
+# Carga defaults versionados por escenario y, después, overrides locales de .env.
+# Las variables ya exportadas por el usuario tienen prioridad sobre ambos.
 # shellcheck source=eval_env.sh
 source "${SCRIPT_DIR}/eval_env.sh"
 
-SCENARIO="${1:-${SCENARIO:-escenario}}"
+SCENARIO="${SCENARIO:-${EVAL_DETECTED_SCENARIO:-escenario}}"
 
 HOST="${HOST:-http://localhost:8080}"
 USERS="${USERS:-50}"
@@ -24,6 +29,11 @@ OUT_ROOT="$(eval_resolve_path "$OUT_ROOT" "$SCRIPT_DIR")"
 LOCUSTFILE="$(eval_resolve_path "$LOCUSTFILE" "$SCRIPT_DIR")"
 RUN_ID="$(date +%Y%m%d_%H%M%S)"
 OUT_DIR="${OUT_ROOT}/${SCENARIO}_${RUN_ID}"
+LOCAL_ENV_FILE=""
+
+if [[ -f "$EVAL_ENV_FILE" ]]; then
+  LOCAL_ENV_FILE="$EVAL_ENV_FILE"
+fi
 
 require_cmd() {
   command -v "$1" >/dev/null 2>&1 || {
@@ -45,7 +55,11 @@ fi
 mkdir -p "$OUT_DIR"
 
 cat > "${OUT_DIR}/metadata.env" <<EOF
+GIT_BRANCH=${EVAL_GIT_BRANCH}
+DETECTED_SCENARIO=${EVAL_DETECTED_SCENARIO}
 SCENARIO=${SCENARIO}
+BACKEND=${EVAL_BACKEND}
+OBSERVABILITY_STACK=${EVAL_OBSERVABILITY_STACK}
 RUN_ID=${RUN_ID}
 HOST=${HOST}
 USERS=${USERS}
@@ -59,14 +73,22 @@ LOCUSTFILE=${LOCUSTFILE}
 CONTAINER_REGEX=${CONTAINER_REGEX:-}
 ENGINE_URL=${ENGINE_URL:-http://localhost:9200}
 PROMETHEUS_URL=${PROMETHEUS_URL:-}
+EVAL_SCENARIO_DEFAULTS_FILE=${EVAL_SCENARIO_DEFAULTS_FILE}
 EVAL_ENV_FILE=${EVAL_ENV_FILE}
+EVAL_LOCAL_ENV_FILE=${LOCAL_ENV_FILE}
 SCRIPT_DIR=${SCRIPT_DIR}
 REPO_ROOT=${EVAL_REPO_ROOT}
 STARTED_AT=$(date -Iseconds)
 EOF
 
 echo "[INFO] Directorio de salida: ${OUT_DIR}"
-echo "[INFO] Configuración cargada desde: ${EVAL_ENV_FILE}"
+echo "[INFO] Rama detectada: ${EVAL_GIT_BRANCH:-unknown}"
+echo "[INFO] Escenario detectado: ${EVAL_DETECTED_SCENARIO}; escenario activo: ${SCENARIO}"
+echo "[INFO] Backend: ${EVAL_BACKEND}; stack: ${EVAL_OBSERVABILITY_STACK}"
+echo "[INFO] Defaults cargados desde: ${EVAL_SCENARIO_DEFAULTS_FILE}"
+if [[ -n "$LOCAL_ENV_FILE" ]]; then
+  echo "[INFO] Overrides locales cargados desde: ${LOCAL_ENV_FILE}"
+fi
 echo "[INFO] Comprobando API Gateway: ${HOST%/}/health"
 
 curl -fsS "${HOST%/}/health" > "${OUT_DIR}/gateway_health.json" || {

@@ -1,0 +1,25 @@
+check,result,detail
+http_status:engine_root.json,PASS,HTTP 200
+http_status:cluster_health.json,PASS,HTTP 200
+http_status:cluster_stats.json,PASS,HTTP 200
+http_status:nodes_stats.json,PASS,HTTP 200
+http_status:indices_stats.json,PASS,HTTP 200
+http_status:indices.json,PASS,HTTP 200
+http_status:count.json,PASS,HTTP 200
+http_status:templates.json,PASS,HTTP 200
+http_status:shards.json,PASS,HTTP 200
+http_status:nodes.json,PASS,HTTP 200
+http_status:allocation.json,PASS,HTTP 200
+http_status:thread_pool.json,PASS,HTTP 200
+http_status:indices_opensearch_otel_v1_apm.json,PASS,HTTP 200
+http_status:indices_opensearch_logs_otel_v1.json,PASS,HTTP 200
+http_status:indices_opensearch_otel_v2_service_map.json,PASS,HTTP 200
+http_status:indices_opensearch_service_map_all.json,PASS,HTTP 200
+cluster_health:status,PASS,yellow
+cluster_health:timed_out,PASS,false
+cluster_health:nodes,PASS,1
+cluster_health:active_shards,PASS,19
+cluster_health:unassigned_shards,WARN,9
+indices:count,PASS,16
+indices:red_health,PASS,
+indices:scenario_a_telemetry,PASS,7

@@ -1,0 +1,1 @@
+{"skipped":true,"reason":"OpenSearch scenario A stores telemetry in indices; /_cat/data_streams is not available in this backend/version."}

@@ -1,0 +1,681 @@
+{
+  "_nodes" : {
+    "total" : 1,
+    "successful" : 1,
+    "failed" : 0
+  },
+  "cluster_name" : "docker-cluster",
+  "cluster_uuid" : "fTokkZakQsOJ0y6wW53I-g",
+  "timestamp" : 1779741288025,
+  "status" : "yellow",
+  "indices" : {
+    "count" : 19,
+    "shards" : {
+      "total" : 19,
+      "primaries" : 19,
+      "replication" : 0.0,
+      "index" : {
+        "shards" : {
+          "min" : 1,
+          "max" : 1,
+          "avg" : 1.0
+        },
+        "primaries" : {
+          "min" : 1,
+          "max" : 1,
+          "avg" : 1.0
+        },
+        "replication" : {
+          "min" : 0.0,
+          "max" : 0.0,
+          "avg" : 0.0
+        }
+      }
+    },
+    "docs" : {
+      "count" : 4695253,
+      "deleted" : 184
+    },
+    "store" : {
+      "size" : "1.8gb",
+      "size_in_bytes" : 1960886485,
+      "reserved" : "0b",
+      "reserved_in_bytes" : 0
+    },
+    "fielddata" : {
+      "memory_size" : "0b",
+      "memory_size_in_bytes" : 0,
+      "evictions" : 0
+    },
+    "query_cache" : {
+      "memory_size" : "72.6kb",
+      "memory_size_in_bytes" : 74440,
+      "total_count" : 196,
+      "hit_count" : 9,
+      "miss_count" : 187,
+      "cache_size" : 8,
+      "cache_count" : 12,
+      "evictions" : 4
+    },
+    "completion" : {
+      "size" : "0b",
+      "size_in_bytes" : 0
+    },
+    "segments" : {
+      "count" : 91,
+      "memory" : "0b",
+      "memory_in_bytes" : 0,
+      "terms_memory" : "0b",
+      "terms_memory_in_bytes" : 0,
+      "stored_fields_memory" : "0b",
+      "stored_fields_memory_in_bytes" : 0,
+      "term_vectors_memory" : "0b",
+      "term_vectors_memory_in_bytes" : 0,
+      "norms_memory" : "0b",
+      "norms_memory_in_bytes" : 0,
+      "points_memory" : "0b",
+      "points_memory_in_bytes" : 0,
+      "doc_values_memory" : "0b",
+      "doc_values_memory_in_bytes" : 0,
+      "index_writer_memory" : "12.5mb",
+      "index_writer_memory_in_bytes" : 13126852,
+      "version_map_memory" : "2.6kb",
+      "version_map_memory_in_bytes" : 2698,
+      "fixed_bit_set" : "459.7kb",
+      "fixed_bit_set_memory_in_bytes" : 470808,
+      "max_unsafe_auto_id_timestamp" : 1779738913282,
+      "remote_store" : {
+        "upload" : {
+          "total_upload_size" : {
+            "started" : "0b",
+            "started_bytes" : 0,
+            "succeeded" : "0b",
+            "succeeded_bytes" : 0,
+            "failed" : "0b",
+            "failed_bytes" : 0
+          },
+          "refresh_size_lag" : {
+            "total" : "0b",
+            "total_bytes" : 0,
+            "max" : "0b",
+            "max_bytes" : 0
+          },
+          "max_refresh_time_lag" : "0s",
+          "max_refresh_time_lag_in_millis" : 0,
+          "total_time_spent" : "0s",
+          "total_time_spent_in_millis" : 0,
+          "pressure" : {
+            "total_rejections" : 0
+          }
+        },
+        "download" : {
+          "total_download_size" : {
+            "started" : "0b",
+            "started_bytes" : 0,
+            "succeeded" : "0b",
+            "succeeded_bytes" : 0,
+            "failed" : "0b",
+            "failed_bytes" : 0
+          },
+          "total_time_spent" : "0s",
+          "total_time_spent_in_millis" : 0
+        }
+      },
+      "segment_replication" : {
+        "max_bytes_behind" : 0,
+        "total_bytes_behind" : 0,
+        "max_replication_lag" : 0
+      },
+      "file_sizes" : { }
+    },
+    "mappings" : {
+      "field_types" : [
+        {
+          "name" : "boolean",
+          "count" : 50,
+          "index_count" : 9
+        },
+        {
+          "name" : "date",
+          "count" : 51,
+          "index_count" : 11
+        },
+        {
+          "name" : "date_nanos",
+          "count" : 16,
+          "index_count" : 4
+        },
+        {
+          "name" : "double",
+          "count" : 15,
+          "index_count" : 6
+        },
+        {
+          "name" : "flat_object",
+          "count" : 1,
+          "index_count" : 1
+        },
+        {
+          "name" : "integer",
+          "count" : 74,
+          "index_count" : 10
+        },
+        {
+          "name" : "keyword",
+          "count" : 517,
+          "index_count" : 19
+        },
+        {
+          "name" : "long",
+          "count" : 108,
+          "index_count" : 12
+        },
+        {
+          "name" : "match_only_text",
+          "count" : 2,
+          "index_count" : 2
+        },
+        {
+          "name" : "nested",
+          "count" : 18,
+          "index_count" : 4
+        },
+        {
+          "name" : "object",
+          "count" : 347,
+          "index_count" : 15
+        },
+        {
+          "name" : "text",
+          "count" : 260,
+          "index_count" : 14
+        }
+      ]
+    },
+    "analysis" : {
+      "char_filter_types" : [ ],
+      "tokenizer_types" : [ ],
+      "filter_types" : [ ],
+      "analyzer_types" : [ ],
+      "built_in_char_filters" : [ ],
+      "built_in_tokenizers" : [ ],
+      "built_in_filters" : [ ],
+      "built_in_analyzers" : [
+        {
+          "name" : "whitespace",
+          "count" : 1,
+          "index_count" : 1
+        }
+      ]
+    }
+  },
+  "nodes" : {
+    "count" : {
+      "total" : 1,
+      "cluster_manager" : 1,
+      "coordinating_only" : 0,
+      "data" : 1,
+      "ingest" : 1,
+      "master" : 1,
+      "remote_cluster_client" : 1,
+      "search" : 0,
+      "warm" : 0
+    },
+    "versions" : [
+      "3.6.0"
+    ],
+    "os" : {
+      "available_processors" : 12,
+      "allocated_processors" : 12,
+      "names" : [
+        {
+          "name" : "Linux",
+          "count" : 1
+        }
+      ],
+      "pretty_names" : [
+        {
+          "pretty_name" : "Amazon Linux 2023.11.20260514",
+          "count" : 1
+        }
+      ],
+      "mem" : {
+        "total" : "30.6gb",
+        "total_in_bytes" : 32887222272,
+        "free" : "4.1gb",
+        "free_in_bytes" : 4453724160,
+        "used" : "26.4gb",
+        "used_in_bytes" : 28433498112,
+        "free_percent" : 14,
+        "used_percent" : 86
+      }
+    },
+    "process" : {
+      "cpu" : {
+        "percent" : 1
+      },
+      "open_file_descriptors" : {
+        "min" : 1047,
+        "max" : 1047,
+        "avg" : 1047
+      }
+    },
+    "jvm" : {
+      "max_uptime" : "39.8m",
+      "max_uptime_in_millis" : 2392602,
+      "versions" : [
+        {
+          "version" : "25.0.2",
+          "vm_name" : "OpenJDK 64-Bit Server VM",
+          "vm_version" : "25.0.2+10-LTS",
+          "vm_vendor" : "Eclipse Adoptium",
+          "bundled_jdk" : true,
+          "using_bundled_jdk" : true,
+          "count" : 1
+        }
+      ],
+      "mem" : {
+        "heap_used" : "269.7mb",
+        "heap_used_in_bytes" : 282879952,
+        "heap_max" : "512mb",
+        "heap_max_in_bytes" : 536870912
+      },
+      "threads" : 206
+    },
+    "fs" : {
+      "total" : "934.8gb",
+      "total_in_bytes" : 1003736440832,
+      "free" : "840.5gb",
+      "free_in_bytes" : 902537506816,
+      "available" : "792.9gb",
+      "available_in_bytes" : 851475001344,
+      "cache_reserved" : "0b",
+      "cache_reserved_in_bytes" : 0
+    },
+    "plugins" : [
+      {
+        "name" : "opensearch-cross-cluster-replication",
+        "version" : "3.6.0.0",
+        "opensearch_version" : "3.6.0",
+        "java_version" : "21",
+        "description" : "OpenSearch Cross Cluster Replication Plugin",
+        "classname" : "org.opensearch.replication.ReplicationPlugin",
+        "custom_foldername" : "",
+        "extended_plugins" : [ ],
+        "has_native_controller" : false,
+        "optional_extended_plugins" : [ ]
+      },
+      {
+        "name" : "opensearch-custom-codecs",
+        "version" : "3.6.0.0",
+        "opensearch_version" : "3.6.0",
+        "java_version" : "21",
+        "description" : "OpenSearch plugin that implements custom compression codecs",
+        "classname" : "org.opensearch.index.codec.customcodecs.CustomCodecPlugin",
+        "custom_foldername" : "",
+        "extended_plugins" : [ ],
+        "has_native_controller" : false,
+        "optional_extended_plugins" : [ ]
+      },
+      {
+        "name" : "opensearch-reports-scheduler",
+        "version" : "3.6.0.0",
+        "opensearch_version" : "3.6.0",
+        "java_version" : "21",
+        "description" : "Scheduler for Dashboards Reports Plugin",
+        "classname" : "org.opensearch.reportsscheduler.ReportsSchedulerPlugin",
+        "custom_foldername" : "",
+        "extended_plugins" : [
+          "opensearch-job-scheduler",
+          "opensearch-security"
+        ],
+        "has_native_controller" : false,
+        "optional_extended_plugins" : [
+          "opensearch-security"
+        ]
+      },
+      {
+        "name" : "opensearch-ubi",
+        "version" : "3.6.0.0",
+        "opensearch_version" : "3.6.0",
+        "java_version" : "21",
+        "description" : "OpenSearch User Behavior Insights Plugin",
+        "classname" : "org.opensearch.ubi.UbiPlugin",
+        "custom_foldername" : "",
+        "extended_plugins" : [ ],
+        "has_native_controller" : false,
+        "optional_extended_plugins" : [ ]
+      },
+      {
+        "name" : "opensearch-alerting",
+        "version" : "3.6.0.0",
+        "opensearch_version" : "3.6.0",
+        "java_version" : "21",
+        "description" : "Amazon OpenSearch alerting plugin",
+        "classname" : "org.opensearch.alerting.AlertingPlugin",
+        "custom_foldername" : "",
+        "extended_plugins" : [
+          "lang-painless"
+        ],
+        "has_native_controller" : false,
+        "optional_extended_plugins" : [ ]
+      },
+      {
+        "name" : "opensearch-search-relevance",
+        "version" : "3.6.0.0",
+        "opensearch_version" : "3.6.0",
+        "java_version" : "21",
+        "description" : "opensearch plugin that enables users to fine tuning search based on search relevance judgments",
+        "classname" : "org.opensearch.searchrelevance.plugin.SearchRelevancePlugin",
+        "custom_foldername" : "",
+        "extended_plugins" : [
+          "opensearch-job-scheduler"
+        ],
+        "has_native_controller" : false,
+        "optional_extended_plugins" : [ ]
+      },
+      {
+        "name" : "opensearch-anomaly-detection",
+        "version" : "3.6.0.0",
+        "opensearch_version" : "3.6.0",
+        "java_version" : "21",
+        "description" : "OpenSearch anomaly detector plugin",
+        "classname" : "org.opensearch.timeseries.TimeSeriesAnalyticsPlugin",
+        "custom_foldername" : "",
+        "extended_plugins" : [
+          "lang-painless",
+          "opensearch-job-scheduler",
+          "opensearch-security"
+        ],
+        "has_native_controller" : false,
+        "optional_extended_plugins" : [
+          "opensearch-security"
+        ]
+      },
+      {
+        "name" : "opensearch-geospatial",
+        "version" : "3.6.0.0",
+        "opensearch_version" : "3.6.0",
+        "java_version" : "21",
+        "description" : "OpenSearch Geospatial plugin to host geospatial features",
+        "classname" : "org.opensearch.geospatial.plugin.GeospatialPlugin",
+        "custom_foldername" : "",
+        "extended_plugins" : [
+          "opensearch-job-scheduler"
+        ],
+        "has_native_controller" : false,
+        "optional_extended_plugins" : [ ]
+      },
+      {
+        "name" : "opensearch-system-templates",
+        "version" : "3.6.0.0",
+        "opensearch_version" : "3.6.0",
+        "java_version" : "21",
+        "description" : "OpenSearch plugin that provides basic application based configuration templates.",
+        "classname" : "org.opensearch.system.applicationtemplates.ApplicationBasedConfigurationSystemTemplatesPlugin",
+        "custom_foldername" : "",
+        "extended_plugins" : [ ],
+        "has_native_controller" : false,
+        "optional_extended_plugins" : [ ]
+      },
+      {
+        "name" : "opensearch-performance-analyzer",
+        "version" : "3.6.0.0",
+        "opensearch_version" : "3.6.0",
+        "java_version" : "21",
+        "description" : "OpenSearch Performance Analyzer Plugin",
+        "classname" : "org.opensearch.performanceanalyzer.PerformanceAnalyzerPlugin",
+        "custom_foldername" : "",
+        "extended_plugins" : [ ],
+        "has_native_controller" : false,
+        "optional_extended_plugins" : [ ]
+      },
+      {
+        "name" : "opensearch-ml",
+        "version" : "3.6.0.0",
+        "opensearch_version" : "3.6.0",
+        "java_version" : "21",
+        "description" : "machine learning plugin for opensearch",
+        "classname" : "org.opensearch.ml.plugin.MachineLearningPlugin",
+        "custom_foldername" : "",
+        "extended_plugins" : [
+          "opensearch-job-scheduler",
+          "opensearch-security"
+        ],
+        "has_native_controller" : false,
+        "optional_extended_plugins" : [
+          "opensearch-security"
+        ]
+      },
+      {
+        "name" : "opensearch-asynchronous-search",
+        "version" : "3.6.0.0",
+        "opensearch_version" : "3.6.0",
+        "java_version" : "21",
+        "description" : "Provides support for asynchronous search",
+        "classname" : "org.opensearch.search.asynchronous.plugin.AsynchronousSearchPlugin",
+        "custom_foldername" : "",
+        "extended_plugins" : [ ],
+        "has_native_controller" : false,
+        "optional_extended_plugins" : [ ]
+      },
+      {
+        "name" : "opensearch-skills",
+        "version" : "3.6.0.0",
+        "opensearch_version" : "3.6.0",
+        "java_version" : "21",
+        "description" : "OpenSearch Skills",
+        "classname" : "org.opensearch.agent.ToolPlugin",
+        "custom_foldername" : "",
+        "extended_plugins" : [
+          "opensearch-ml"
+        ],
+        "has_native_controller" : false,
+        "optional_extended_plugins" : [ ]
+      },
+      {
+        "name" : "opensearch-sql",
+        "version" : "3.6.0.0",
+        "opensearch_version" : "3.6.0",
+        "java_version" : "21",
+        "description" : "OpenSearch SQL",
+        "classname" : "org.opensearch.sql.plugin.SQLPlugin",
+        "custom_foldername" : "",
+        "extended_plugins" : [
+          "opensearch-job-scheduler"
+        ],
+        "has_native_controller" : false,
+        "optional_extended_plugins" : [ ]
+      },
+      {
+        "name" : "opensearch-notifications",
+        "version" : "3.6.0.0",
+        "opensearch_version" : "3.6.0",
+        "java_version" : "21",
+        "description" : "OpenSearch Notifications Plugin",
+        "classname" : "org.opensearch.notifications.NotificationPlugin",
+        "custom_foldername" : "",
+        "extended_plugins" : [
+          "opensearch-notifications-core"
+        ],
+        "has_native_controller" : false,
+        "optional_extended_plugins" : [ ]
+      },
+      {
+        "name" : "opensearch-ltr",
+        "version" : "3.6.0.0",
+        "opensearch_version" : "3.6.0",
+        "java_version" : "21",
+        "description" : "Learning to Rank Query w/ RankLib Models",
+        "classname" : "com.o19s.es.ltr.LtrQueryParserPlugin",
+        "custom_foldername" : "",
+        "extended_plugins" : [ ],
+        "has_native_controller" : false,
+        "optional_extended_plugins" : [ ]
+      },
+      {
+        "name" : "opensearch-neural-search",
+        "version" : "3.6.0.0",
+        "opensearch_version" : "3.6.0",
+        "java_version" : "21",
+        "description" : "A plugin that adds dense neural retrieval into the OpenSearch ecosytem",
+        "classname" : "org.opensearch.neuralsearch.plugin.NeuralSearch",
+        "custom_foldername" : "",
+        "extended_plugins" : [
+          "opensearch-knn",
+          "transport-grpc"
+        ],
+        "has_native_controller" : false,
+        "optional_extended_plugins" : [ ]
+      },
+      {
+        "name" : "opensearch-security",
+        "version" : "3.6.0.0",
+        "opensearch_version" : "3.6.0",
+        "java_version" : "21",
+        "description" : "Provide access control related features for OpenSearch",
+        "classname" : "org.opensearch.security.OpenSearchSecurityPlugin",
+        "custom_foldername" : "",
+        "extended_plugins" : [
+          "rule-framework",
+          "workload-management",
+          "transport-grpc"
+        ],
+        "has_native_controller" : false,
+        "optional_extended_plugins" : [
+          "workload-management",
+          "transport-grpc"
+        ]
+      },
+      {
+        "name" : "opensearch-flow-framework",
+        "version" : "3.6.0.0",
+        "opensearch_version" : "3.6.0",
+        "java_version" : "21",
+        "description" : "OpenSearch plugin that enables builders to innovate AI apps on OpenSearch",
+        "classname" : "org.opensearch.flowframework.FlowFrameworkPlugin",
+        "custom_foldername" : "",
+        "extended_plugins" : [
+          "opensearch-security"
+        ],
+        "has_native_controller" : false,
+        "optional_extended_plugins" : [
+          "opensearch-security"
+        ]
+      },
+      {
+        "name" : "opensearch-index-management",
+        "version" : "3.6.0.0",
+        "opensearch_version" : "3.6.0",
+        "java_version" : "21",
+        "description" : "OpenSearch Index Management Plugin",
+        "classname" : "org.opensearch.indexmanagement.IndexManagementPlugin",
+        "custom_foldername" : "",
+        "extended_plugins" : [
+          "opensearch-job-scheduler"
+        ],
+        "has_native_controller" : false,
+        "optional_extended_plugins" : [ ]
+      },
+      {
+        "name" : "query-insights",
+        "version" : "3.6.0.0",
+        "opensearch_version" : "3.6.0",
+        "java_version" : "21",
+        "description" : "OpenSearch Query Insights plugin",
+        "classname" : "org.opensearch.plugin.insights.QueryInsightsPlugin",
+        "custom_foldername" : "",
+        "extended_plugins" : [ ],
+        "has_native_controller" : false,
+        "optional_extended_plugins" : [ ]
+      },
+      {
+        "name" : "opensearch-job-scheduler",
+        "version" : "3.6.0.0",
+        "opensearch_version" : "3.6.0",
+        "java_version" : "21",
+        "description" : "OpenSearch Job Scheduler plugin",
+        "classname" : "org.opensearch.jobscheduler.JobSchedulerPlugin",
+        "custom_foldername" : "",
+        "extended_plugins" : [ ],
+        "has_native_controller" : false,
+        "optional_extended_plugins" : [ ]
+      },
+      {
+        "name" : "opensearch-notifications-core",
+        "version" : "3.6.0.0",
+        "opensearch_version" : "3.6.0",
+        "java_version" : "21",
+        "description" : "OpenSearch Notifications Core Plugin",
+        "classname" : "org.opensearch.notifications.core.NotificationCorePlugin",
+        "custom_foldername" : "",
+        "extended_plugins" : [ ],
+        "has_native_controller" : false,
+        "optional_extended_plugins" : [ ]
+      },
+      {
+        "name" : "opensearch-knn",
+        "version" : "3.6.0.0",
+        "opensearch_version" : "3.6.0",
+        "java_version" : "21",
+        "description" : "OpenSearch k-NN plugin",
+        "classname" : "org.opensearch.knn.plugin.KNNPlugin",
+        "custom_foldername" : "",
+        "extended_plugins" : [
+          "lang-painless",
+          "transport-grpc"
+        ],
+        "has_native_controller" : false,
+        "optional_extended_plugins" : [ ]
+      },
+      {
+        "name" : "opensearch-observability",
+        "version" : "3.6.0.0",
+        "opensearch_version" : "3.6.0",
+        "java_version" : "21",
+        "description" : "OpenSearch Plugin for OpenSearch Dashboards Observability",
+        "classname" : "org.opensearch.observability.ObservabilityPlugin",
+        "custom_foldername" : "",
+        "extended_plugins" : [ ],
+        "has_native_controller" : false,
+        "optional_extended_plugins" : [ ]
+      },
+      {
+        "name" : "opensearch-security-analytics",
+        "version" : "3.6.0.0",
+        "opensearch_version" : "3.6.0",
+        "java_version" : "21",
+        "description" : "OpenSearch Security Analytics plugin",
+        "classname" : "org.opensearch.securityanalytics.SecurityAnalyticsPlugin",
+        "custom_foldername" : "",
+        "extended_plugins" : [
+          "opensearch-job-scheduler",
+          "opensearch-alerting"
+        ],
+        "has_native_controller" : false,
+        "optional_extended_plugins" : [ ]
+      }
+    ],
+    "network_types" : {
+      "transport_types" : {
+        "org.opensearch.security.ssl.http.netty.SecuritySSLNettyTransport" : 1
+      },
+      "http_types" : {
+        "org.opensearch.security.http.SecurityHttpServerTransport" : 1
+      }
+    },
+    "discovery_types" : {
+      "single-node" : 1
+    },
+    "packaging_types" : [
+      {
+        "type" : "tar",
+        "count" : 1
+      }
+    ],
+    "ingest" : {
+      "number_of_pipelines" : 0,
+      "processor_stats" : { }
+    }
+  }
+}

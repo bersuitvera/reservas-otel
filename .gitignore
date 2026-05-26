@@ -37,6 +37,8 @@ pip-wheel-metadata/
 venv/
 env/
 ENV/
+!scripts/scripts-eval/env/
+!scripts/scripts-eval/env/*.env
 
 # Environment variables
 .env
@@ -48,3 +50,6 @@ ENV/
 # Local docker volumes/data
 opensearch-data/
 elasticsearch-data/
+
+# Evaluation outputs
+scripts/scripts-eval/results/

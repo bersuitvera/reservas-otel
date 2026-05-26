@@ -1,0 +1,128 @@
+{
+  "passes": 23,
+  "warnings": 1,
+  "failures": 0,
+  "skipped": 0,
+  "checks": [
+    {
+      "check": "http_status:engine_root.json",
+      "result": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "check": "http_status:cluster_health.json",
+      "result": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "check": "http_status:cluster_stats.json",
+      "result": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "check": "http_status:nodes_stats.json",
+      "result": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "check": "http_status:indices_stats.json",
+      "result": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "check": "http_status:indices.json",
+      "result": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "check": "http_status:count.json",
+      "result": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "check": "http_status:templates.json",
+      "result": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "check": "http_status:shards.json",
+      "result": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "check": "http_status:nodes.json",
+      "result": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "check": "http_status:allocation.json",
+      "result": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "check": "http_status:thread_pool.json",
+      "result": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "check": "http_status:indices_opensearch_otel_v1_apm.json",
+      "result": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "check": "http_status:indices_opensearch_logs_otel_v1.json",
+      "result": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "check": "http_status:indices_opensearch_otel_v2_service_map.json",
+      "result": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "check": "http_status:indices_opensearch_service_map_all.json",
+      "result": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "check": "cluster_health:status",
+      "result": "PASS",
+      "detail": "yellow"
+    },
+    {
+      "check": "cluster_health:timed_out",
+      "result": "PASS",
+      "detail": "false"
+    },
+    {
+      "check": "cluster_health:nodes",
+      "result": "PASS",
+      "detail": "1"
+    },
+    {
+      "check": "cluster_health:active_shards",
+      "result": "PASS",
+      "detail": "19"
+    },
+    {
+      "check": "cluster_health:unassigned_shards",
+      "result": "WARN",
+      "detail": "9"
+    },
+    {
+      "check": "indices:count",
+      "result": "PASS",
+      "detail": "16"
+    },
+    {
+      "check": "indices:red_health",
+      "result": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "indices:scenario_a_telemetry",
+      "result": "PASS",
+      "detail": "7"
+    }
+  ]
+}

@@ -24,6 +24,9 @@ require_cmd python3
 
 queries=(
   "up"
+  "up{job=\"otel-collector\"}"
+  "up{job=\"data-prepper\"}"
+  "up{job=\"opensearch\"}"
   "otelcol_receiver_accepted_spans_total"
   "otelcol_receiver_accepted_metric_points_total"
   "otelcol_receiver_accepted_log_records_total"
@@ -33,6 +36,26 @@ queries=(
   "otelcol_exporter_send_failed_spans_total"
   "otelcol_exporter_send_failed_metric_points_total"
   "otelcol_exporter_send_failed_log_records_total"
+  "otelcol_exporter_queue_size"
+  "otelcol_processor_batch_batch_send_size_count"
+  "elasticsearch_cluster_health_status"
+  "elasticsearch_cluster_health_number_of_nodes"
+  "elasticsearch_cluster_health_active_shards"
+  "elasticsearch_cluster_health_unassigned_shards"
+  "elasticsearch_indices_docs"
+  "elasticsearch_indices_store_size_bytes"
+  "elasticsearch_thread_pool_rejected_count"
+  "elasticsearch_jvm_memory_used_bytes"
+  "entry_pipeline_BlockingBuffer_recordsInBuffer"
+  "entry_pipeline_BlockingBuffer_recordsInFlight"
+  "entry_pipeline_BlockingBuffer_recordsWriteFailed_total"
+  "traces_raw_pipeline_opensearch_recordsIn_total"
+  "logs_pipeline_opensearch_recordsIn_total"
+  "service_map_pipeline_opensearch_recordsIn_total"
+  "service_map_pipeline_prometheus_recordsIn_total"
+  "traces_raw_pipeline_BlockingBuffer_recordsWriteFailed_total"
+  "logs_pipeline_BlockingBuffer_recordsWriteFailed_total"
+  "service_map_pipeline_BlockingBuffer_recordsWriteFailed_total"
   "process_cpu_seconds_total"
   "process_resident_memory_bytes"
 )
@@ -55,3 +78,5 @@ PY
     echo "[WARN] Prometheus query '${query}' devolvió HTTP ${status}" >&2
   fi
 done
+
+python3 "${SCRIPT_DIR}/summarize_prometheus_snapshot.py" "$OUT_DIR"

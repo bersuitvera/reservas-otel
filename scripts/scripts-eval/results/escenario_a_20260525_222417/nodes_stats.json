@@ -1,0 +1,529 @@
+{
+  "_nodes" : {
+    "total" : 1,
+    "successful" : 1,
+    "failed" : 0
+  },
+  "cluster_name" : "docker-cluster",
+  "nodes" : {
+    "AMqaKO9gRaOYyTy-yXAc8Q" : {
+      "timestamp" : 1779741288040,
+      "name" : "29fa7c807076",
+      "transport_address" : "172.18.0.3:9300",
+      "host" : "172.18.0.3",
+      "ip" : "172.18.0.3:9300",
+      "roles" : [
+        "cluster_manager",
+        "data",
+        "ingest",
+        "remote_cluster_client"
+      ],
+      "attributes" : {
+        "shard_indexing_pressure_enabled" : "true"
+      },
+      "indices" : {
+        "docs" : {
+          "count" : 4695253,
+          "deleted" : 184
+        },
+        "store" : {
+          "size" : "1.8gb",
+          "size_in_bytes" : 1960886485,
+          "reserved" : "0b",
+          "reserved_in_bytes" : 0
+        },
+        "indexing" : {
+          "index_total" : 1901483,
+          "index_time" : "1.2m",
+          "index_time_in_millis" : 74417,
+          "index_current" : 0,
+          "index_failed" : 12,
+          "delete_total" : 26,
+          "delete_time" : "6ms",
+          "delete_time_in_millis" : 6,
+          "delete_current" : 0,
+          "noop_update_total" : 0,
+          "is_throttled" : false,
+          "throttle_time" : "0s",
+          "throttle_time_in_millis" : 0,
+          "max_last_index_request_timestamp" : 1779741285462
+        },
+        "get" : {
+          "total" : 475,
+          "getTime" : "159ms",
+          "time" : "159ms",
+          "time_in_millis" : 159,
+          "exists_total" : 361,
+          "exists_time" : "137ms",
+          "exists_time_in_millis" : 137,
+          "missing_total" : 114,
+          "missing_time" : "22ms",
+          "missing_time_in_millis" : 22,
+          "current" : 0
+        },
+        "search" : {
+          "open_contexts" : 0,
+          "query_total" : 296,
+          "query_time" : "830ms",
+          "query_time_in_millis" : 830,
+          "query_current" : 0,
+          "query_failed" : 0,
+          "concurrent_query_total" : 20,
+          "concurrent_query_time" : "546ms",
+          "concurrent_query_time_in_millis" : 546,
+          "concurrent_query_current" : 0,
+          "concurrent_avg_slice_count" : 3.6,
+          "startree_query_total" : 0,
+          "startree_query_time" : "0s",
+          "startree_query_time_in_millis" : 0,
+          "startree_query_current" : 0,
+          "startree_query_failed" : 0,
+          "fetch_total" : 246,
+          "fetch_time" : "355ms",
+          "fetch_time_in_millis" : 355,
+          "fetch_current" : 0,
+          "scroll_total" : 0,
+          "scroll_time" : "0s",
+          "scroll_time_in_millis" : 0,
+          "scroll_current" : 0,
+          "point_in_time_total" : 6,
+          "point_in_time_time" : "689ms",
+          "point_in_time_time_in_millis" : 689,
+          "point_in_time_current" : 0,
+          "suggest_total" : 0,
+          "suggest_time" : "0s",
+          "suggest_time_in_millis" : 0,
+          "suggest_current" : 0,
+          "search_idle_reactivate_count_total" : 11,
+          "request" : {
+            "took" : {
+              "time" : "7s",
+              "time_in_millis" : 7065,
+              "current" : 1,
+              "total" : 259
+            },
+            "dfs_pre_query" : {
+              "time" : "0s",
+              "time_in_millis" : 0,
+              "current" : 0,
+              "total" : 0
+            },
+            "query" : {
+              "time" : "6.6s",
+              "time_in_millis" : 6662,
+              "current" : 0,
+              "total" : 254
+            },
+            "fetch" : {
+              "time" : "220ms",
+              "time_in_millis" : 220,
+              "current" : 0,
+              "total" : 254
+            },
+            "dfs_query" : {
+              "time" : "0s",
+              "time_in_millis" : 0,
+              "current" : 0,
+              "total" : 0
+            },
+            "expand" : {
+              "time" : "0s",
+              "time_in_millis" : 0,
+              "current" : 0,
+              "total" : 254
+            },
+            "can_match" : {
+              "time" : "2ms",
+              "time_in_millis" : 2,
+              "current" : 0,
+              "total" : 1
+            }
+          }
+        },
+        "merges" : {
+          "current" : 1,
+          "current_docs" : 1407264,
+          "current_size" : "473.4mb",
+          "current_size_in_bytes" : 496439590,
+          "total" : 40,
+          "total_time" : "38.8s",
+          "total_time_in_millis" : 38842,
+          "total_docs" : 2027280,
+          "total_size" : "671.1mb",
+          "total_size_in_bytes" : 703710414,
+          "total_stopped_time" : "0s",
+          "total_stopped_time_in_millis" : 0,
+          "total_throttled_time" : "28.5s",
+          "total_throttled_time_in_millis" : 28503,
+          "total_auto_throttle" : "370mb",
+          "total_auto_throttle_in_bytes" : 387998186,
+          "unreferenced_file_cleanups_performed" : 0,
+          "warmer" : {
+            "total_invocations_count" : 0,
+            "total_time" : "0s",
+            "total_time_millis" : 0,
+            "total_failure_count" : 0,
+            "total_sent_size" : "0b",
+            "total_bytes_sent" : 0,
+            "total_received_size" : "0b",
+            "total_bytes_received" : 0,
+            "total_send_time" : "0s",
+            "total_send_time_millis" : 0,
+            "total_receive_time" : "0s",
+            "total_receive_time_millis" : 0,
+            "ongoing_count" : 0
+          }
+        },
+        "refresh" : {
+          "total" : 429,
+          "total_time" : "11.2s",
+          "total_time_in_millis" : 11216,
+          "external_total" : 385,
+          "external_total_time" : "4.9s",
+          "external_total_time_in_millis" : 4976,
+          "listeners" : 0
+        },
+        "flush" : {
+          "total" : 18,
+          "periodic" : 18,
+          "total_time" : "4.9s",
+          "total_time_in_millis" : 4918
+        },
+        "warmer" : {
+          "current" : 0,
+          "total" : 354,
+          "total_time" : "60ms",
+          "total_time_in_millis" : 60
+        },
+        "query_cache" : {
+          "memory_size" : "72.6kb",
+          "memory_size_in_bytes" : 74440,
+          "total_count" : 196,
+          "hit_count" : 9,
+          "miss_count" : 187,
+          "cache_size" : 8,
+          "cache_count" : 12,
+          "evictions" : 4
+        },
+        "fielddata" : {
+          "memory_size" : "0b",
+          "memory_size_in_bytes" : 0,
+          "evictions" : 0
+        },
+        "completion" : {
+          "size" : "0b",
+          "size_in_bytes" : 0
+        },
+        "segments" : {
+          "count" : 91,
+          "memory" : "0b",
+          "memory_in_bytes" : 0,
+          "terms_memory" : "0b",
+          "terms_memory_in_bytes" : 0,
+          "stored_fields_memory" : "0b",
+          "stored_fields_memory_in_bytes" : 0,
+          "term_vectors_memory" : "0b",
+          "term_vectors_memory_in_bytes" : 0,
+          "norms_memory" : "0b",
+          "norms_memory_in_bytes" : 0,
+          "points_memory" : "0b",
+          "points_memory_in_bytes" : 0,
+          "doc_values_memory" : "0b",
+          "doc_values_memory_in_bytes" : 0,
+          "index_writer_memory" : "12.5mb",
+          "index_writer_memory_in_bytes" : 13126852,
+          "version_map_memory" : "2.6kb",
+          "version_map_memory_in_bytes" : 2698,
+          "fixed_bit_set" : "459.7kb",
+          "fixed_bit_set_memory_in_bytes" : 470808,
+          "max_unsafe_auto_id_timestamp" : 1779738913282,
+          "remote_store" : {
+            "upload" : {
+              "total_upload_size" : {
+                "started" : "0b",
+                "started_bytes" : 0,
+                "succeeded" : "0b",
+                "succeeded_bytes" : 0,
+                "failed" : "0b",
+                "failed_bytes" : 0
+              },
+              "refresh_size_lag" : {
+                "total" : "0b",
+                "total_bytes" : 0,
+                "max" : "0b",
+                "max_bytes" : 0
+              },
+              "max_refresh_time_lag" : "0s",
+              "max_refresh_time_lag_in_millis" : 0,
+              "total_time_spent" : "0s",
+              "total_time_spent_in_millis" : 0,
+              "pressure" : {
+                "total_rejections" : 0
+              }
+            },
+            "download" : {
+              "total_download_size" : {
+                "started" : "0b",
+                "started_bytes" : 0,
+                "succeeded" : "0b",
+                "succeeded_bytes" : 0,
+                "failed" : "0b",
+                "failed_bytes" : 0
+              },
+              "total_time_spent" : "0s",
+              "total_time_spent_in_millis" : 0
+            }
+          },
+          "segment_replication" : {
+            "max_bytes_behind" : 0,
+            "total_bytes_behind" : 0,
+            "max_replication_lag" : 0
+          },
+          "file_sizes" : { }
+        },
+        "translog" : {
+          "operations" : 485967,
+          "size" : "509mb",
+          "size_in_bytes" : 533763053,
+          "uncommitted_operations" : 485967,
+          "uncommitted_size" : "509mb",
+          "uncommitted_size_in_bytes" : 533763053,
+          "earliest_last_modified_age" : 2417,
+          "remote_store" : {
+            "upload" : {
+              "total_uploads" : {
+                "started" : 0,
+                "failed" : 0,
+                "succeeded" : 0
+              },
+              "total_upload_size" : {
+                "started" : "0b",
+                "started_bytes" : 0,
+                "failed" : "0b",
+                "failed_bytes" : 0,
+                "succeeded" : "0b",
+                "succeeded_bytes" : 0
+              }
+            }
+          }
+        },
+        "request_cache" : {
+          "memory_size" : "6kb",
+          "memory_size_in_bytes" : 6240,
+          "evictions" : 0,
+          "hit_count" : 9,
+          "miss_count" : 21
+        },
+        "recovery" : {
+          "current_as_source" : 0,
+          "current_as_target" : 0,
+          "throttle_time" : "0s",
+          "throttle_time_in_millis" : 0
+        },
+        "status_counter" : {
+          "doc_status" : {
+            "success" : 1901483,
+            "user_error" : 38,
+            "system_failure" : 0
+          },
+          "search_response_status" : {
+            "success" : 254,
+            "user_error" : 1,
+            "system_failure" : 2
+          }
+        }
+      },
+      "process" : {
+        "timestamp" : 1779741288023,
+        "open_file_descriptors" : 1047,
+        "max_file_descriptors" : 524288,
+        "cpu" : {
+          "percent" : 1,
+          "total" : "5.3m",
+          "total_in_millis" : 319590
+        },
+        "mem" : {
+          "total_virtual" : "9gb",
+          "total_virtual_in_bytes" : 9748525056
+        }
+      },
+      "jvm" : {
+        "timestamp" : 1779741288023,
+        "uptime" : "39.8m",
+        "uptime_in_millis" : 2392602,
+        "mem" : {
+          "heap_used" : "269.7mb",
+          "heap_used_in_bytes" : 282879952,
+          "heap_used_percent" : 52,
+          "heap_committed" : "512mb",
+          "heap_committed_in_bytes" : 536870912,
+          "heap_max" : "512mb",
+          "heap_max_in_bytes" : 536870912,
+          "non_heap_used" : "306.9mb",
+          "non_heap_used_in_bytes" : 321881504,
+          "non_heap_committed" : "323.7mb",
+          "non_heap_committed_in_bytes" : 339476480,
+          "pools" : {
+            "young" : {
+              "used" : "20mb",
+              "used_in_bytes" : 20971520,
+              "max" : "0b",
+              "max_in_bytes" : 0,
+              "peak_used" : "296mb",
+              "peak_used_in_bytes" : 310378496,
+              "peak_max" : "0b",
+              "peak_max_in_bytes" : 0,
+              "last_gc_stats" : {
+                "used" : "0b",
+                "used_in_bytes" : 0,
+                "max" : "0b",
+                "max_in_bytes" : 0,
+                "usage_percent" : -1
+              }
+            },
+            "old" : {
+              "used" : "248mb",
+              "used_in_bytes" : 260046848,
+              "max" : "512mb",
+              "max_in_bytes" : 536870912,
+              "peak_used" : "248mb",
+              "peak_used_in_bytes" : 260046848,
+              "peak_max" : "512mb",
+              "peak_max_in_bytes" : 536870912,
+              "last_gc_stats" : {
+                "used" : "248mb",
+                "used_in_bytes" : 260046848,
+                "max" : "512mb",
+                "max_in_bytes" : 536870912,
+                "usage_percent" : 48
+              }
+            },
+            "survivor" : {
+              "used" : "1.7mb",
+              "used_in_bytes" : 1861584,
+              "max" : "0b",
+              "max_in_bytes" : 0,
+              "peak_used" : "39mb",
+              "peak_used_in_bytes" : 40894464,
+              "peak_max" : "0b",
+              "peak_max_in_bytes" : 0,
+              "last_gc_stats" : {
+                "used" : "1.7mb",
+                "used_in_bytes" : 1861584,
+                "max" : "0b",
+                "max_in_bytes" : 0,
+                "usage_percent" : -1
+              }
+            }
+          }
+        },
+        "threads" : {
+          "count" : 206,
+          "peak_count" : 206
+        },
+        "gc" : {
+          "collectors" : {
+            "young" : {
+              "collection_count" : 513,
+              "collection_time" : "2.2s",
+              "collection_time_in_millis" : 2272
+            },
+            "G1 Concurrent GC" : {
+              "collection_count" : 338,
+              "collection_time" : "1s",
+              "collection_time_in_millis" : 1029
+            },
+            "old" : {
+              "collection_count" : 0,
+              "collection_time" : "0s",
+              "collection_time_in_millis" : 0
+            }
+          }
+        },
+        "buffer_pools" : {
+          "mapped" : {
+            "count" : 204,
+            "used" : "671.7mb",
+            "used_in_bytes" : 704342712,
+            "total_capacity" : "671.7mb",
+            "total_capacity_in_bytes" : 704342712
+          },
+          "direct" : {
+            "count" : 31,
+            "used" : "13.1mb",
+            "used_in_bytes" : 13762561,
+            "total_capacity" : "13.1mb",
+            "total_capacity_in_bytes" : 13762560
+          },
+          "mapped - 'non-volatile memory'" : {
+            "count" : 0,
+            "used" : "0b",
+            "used_in_bytes" : 0,
+            "total_capacity" : "0b",
+            "total_capacity_in_bytes" : 0
+          }
+        },
+        "classes" : {
+          "current_loaded_count" : 44809,
+          "total_loaded_count" : 46671,
+          "total_unloaded_count" : 1862
+        }
+      },
+      "fs" : {
+        "timestamp" : 1779741287084,
+        "total" : {
+          "total" : "934.8gb",
+          "total_in_bytes" : 1003736440832,
+          "free" : "840.5gb",
+          "free_in_bytes" : 902537506816,
+          "available" : "792.9gb",
+          "available_in_bytes" : 851475001344,
+          "cache_reserved" : "0b",
+          "cache_reserved_in_bytes" : 0
+        },
+        "data" : [
+          {
+            "path" : "/usr/share/opensearch/data/nodes/0",
+            "mount" : "/usr/share/opensearch/data (/dev/mapper/ubuntu--vg-ubuntu--lv)",
+            "type" : "ext4",
+            "total" : "934.8gb",
+            "total_in_bytes" : 1003736440832,
+            "free" : "840.5gb",
+            "free_in_bytes" : 902537506816,
+            "available" : "792.9gb",
+            "available_in_bytes" : 851475001344,
+            "cache_reserved" : "0b",
+            "cache_reserved_in_bytes" : 0
+          }
+        ],
+        "io_stats" : {
+          "devices" : [
+            {
+              "device_name" : "dm-1",
+              "operations" : 273157,
+              "read_operations" : 44241,
+              "write_operations" : 228916,
+              "read_kilobytes" : 688148,
+              "write_kilobytes" : 6472212,
+              "read_time" : 4573,
+              "write_time" : 142749,
+              "queue_size" : 147322,
+              "io_time_in_millis" : 58923
+            }
+          ],
+          "total" : {
+            "operations" : 273157,
+            "read_operations" : 44241,
+            "write_operations" : 228916,
+            "read_kilobytes" : 688148,
+            "write_kilobytes" : 6472212,
+            "read_time" : 4573,
+            "write_time" : 142749,
+            "queue_size" : 147322,
+            "io_time_in_millis" : 58923
+          }
+        }
+      }
+    }
+  }
+}

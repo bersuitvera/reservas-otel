@@ -1,0 +1,102 @@
+{
+  "passes": 19,
+  "warnings": 0,
+  "failures": 0,
+  "checks": [
+    {
+      "check": "target:up_job__data_prepper___",
+      "result": "PASS",
+      "detail": "series=1 up=1"
+    },
+    {
+      "check": "target:up_job__opensearch___",
+      "result": "PASS",
+      "detail": "series=1 up=1"
+    },
+    {
+      "check": "target:up_job__otel_collector___",
+      "result": "PASS",
+      "detail": "series=1 up=1"
+    },
+    {
+      "check": "otelcol_exporter_send_failed:otelcol_exporter_send_failed_log_records_total_",
+      "result": "PASS",
+      "detail": "sum=0 series=0"
+    },
+    {
+      "check": "otelcol_exporter_send_failed:otelcol_exporter_send_failed_metric_points_total_",
+      "result": "PASS",
+      "detail": "sum=0 series=0"
+    },
+    {
+      "check": "otelcol_exporter_send_failed:otelcol_exporter_send_failed_spans_total_",
+      "result": "PASS",
+      "detail": "sum=0 series=0"
+    },
+    {
+      "check": "dataprepper_records_write_failed:entry_pipeline_BlockingBuffer_recordsWriteFailed_total_",
+      "result": "PASS",
+      "detail": "sum=0 series=1"
+    },
+    {
+      "check": "dataprepper_records_write_failed:logs_pipeline_BlockingBuffer_recordsWriteFailed_total_",
+      "result": "PASS",
+      "detail": "sum=0 series=1"
+    },
+    {
+      "check": "dataprepper_records_write_failed:service_map_pipeline_BlockingBuffer_recordsWriteFailed_total_",
+      "result": "PASS",
+      "detail": "sum=0 series=1"
+    },
+    {
+      "check": "dataprepper_records_write_failed:traces_raw_pipeline_BlockingBuffer_recordsWriteFailed_total_",
+      "result": "PASS",
+      "detail": "sum=0 series=1"
+    },
+    {
+      "check": "otelcol_exporter_queue:otelcol_exporter_queue_size_",
+      "result": "PASS",
+      "detail": "sum=0 series=3"
+    },
+    {
+      "check": "dataprepper_entry_buffer:entry_pipeline_BlockingBuffer_recordsInBuffer_",
+      "result": "PASS",
+      "detail": "sum=0 series=1"
+    },
+    {
+      "check": "dataprepper_entry_in_flight:entry_pipeline_BlockingBuffer_recordsInFlight_",
+      "result": "PASS",
+      "detail": "sum=0 series=1"
+    },
+    {
+      "check": "opensearch_thread_pool_rejected:elasticsearch_thread_pool_rejected_count_",
+      "result": "PASS",
+      "detail": "sum=0 series=62"
+    },
+    {
+      "check": "otelcol_received_spans",
+      "result": "PASS",
+      "detail": "sum=1.49215e+06 series=1"
+    },
+    {
+      "check": "otelcol_received_logs",
+      "result": "PASS",
+      "detail": "sum=219534 series=1"
+    },
+    {
+      "check": "dataprepper_traces_to_opensearch",
+      "result": "PASS",
+      "detail": "sum=1.48821e+06 series=1"
+    },
+    {
+      "check": "dataprepper_logs_to_opensearch",
+      "result": "PASS",
+      "detail": "sum=219632 series=1"
+    },
+    {
+      "check": "opensearch_indexed_docs",
+      "result": "PASS",
+      "detail": "sum=4.69525e+06 series=1"
+    }
+  ]
+}

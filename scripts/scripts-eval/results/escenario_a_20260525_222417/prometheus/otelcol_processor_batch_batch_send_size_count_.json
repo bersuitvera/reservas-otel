@@ -1,0 +1,1 @@
+{"status":"success","data":{"resultType":"vector","result":[{"metric":{"__name__":"otelcol_processor_batch_batch_send_size_count","component":"telemetry-ingestion","instance":"otel-collector:8888","job":"otel-collector","otel_scope_name":"go.opentelemetry.io/collector/processor/batchprocessor","processor":"batch","service":"otel-collector"},"value":[1779741289.500,"2617"]}]}}
