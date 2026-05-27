@@ -10,8 +10,14 @@ BASE_URL_GATEWAY="${BASE_URL_GATEWAY:-http://localhost:8080}"
 TEST_DAY="${TEST_DAY:-2026-05-01}"
 ROOM_ID="${ROOM_ID:-1}"
 
+
+
 START_TS="${TEST_DAY}T10:00:00"
 END_TS="${TEST_DAY}T11:00:00"
+
+# NUEVO: Generar un ID único para la prueba de observabilidad
+TEST_ID="test-corr-$(date +%Y%m%d-%H%M%S)"
+printf '[INFO] ID de prueba (X-Test-Id): %s\n' "$TEST_ID"
 
 pass() {
   printf '[PASS] %s\n' "$1"
@@ -35,15 +41,16 @@ http_status() {
     curl -sS -o /tmp/reservas_test_body.$$ -w '%{http_code}' \
       -X "$method" \
       -H 'Content-Type: application/json' \
+      -H "X-Test-Id: $TEST_ID" \
       -d "$data" \
       "$url"
   else
     curl -sS -o /tmp/reservas_test_body.$$ -w '%{http_code}' \
       -X "$method" \
+      -H "X-Test-Id: $TEST_ID" \
       "$url"
   fi
 }
-
 assert_status() {
   local name="$1"
   local expected="$2"

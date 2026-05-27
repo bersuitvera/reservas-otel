@@ -1,0 +1,3616 @@
+[INFO] Índices de service map:
+health status index                          uuid                   pri rep docs.count docs.deleted store.size pri.store.size
+yellow open   otel-v2-apm-service-map-000001 Zfc7m6WvTs2yJpH3Yrzlrg   1   1     288947            0     10.9mb         10.9mb
+yellow open   otel-v2-apm-service-map-000003 p8rEdoDeSMOadyPL5FvHpw   1   1          0            0       208b           208b
+yellow open   otel-v2-apm-service-map-000002 RyF7lC8hSRStNYsb_13GLg   1   1     274823            0     11.2mb         11.2mb
+
+[INFO] Muestra de documentos de service map:
+{
+  "took" : 11,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 3,
+    "successful" : 3,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : {
+      "value" : 10000,
+      "relation" : "gte"
+    },
+    "max_score" : 1.0,
+    "hits" : [
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "VEVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "api-gateway"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "user-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /users/{user_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-193158529",
+          "operationConnectionHash" : "2053964614",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "VUVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "api-gateway"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "GET /health",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-1686665724",
+          "operationConnectionHash" : "-771709757",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "VkVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "api-gateway"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "reservation-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-1765098594",
+          "operationConnectionHash" : "-874719522",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "V0VmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "api-gateway"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "room-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "GET /rooms",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /rooms",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "363642735",
+          "operationConnectionHash" : "1653877263",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "WEVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "api-gateway"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "room-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "GET /rooms",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /rooms",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "363642735",
+          "operationConnectionHash" : "1653877263",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "WUVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "api-gateway"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "reservation-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-1765098594",
+          "operationConnectionHash" : "-874719522",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "WkVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "api-gateway"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "user-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /users/{user_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-193158529",
+          "operationConnectionHash" : "2053964614",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "W0VmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "user-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "GET /users/{user_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-945916250",
+          "operationConnectionHash" : "714742441",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "XEVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "api-gateway"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "room-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "GET /rooms",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /rooms",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "363642735",
+          "operationConnectionHash" : "1653877263",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "XUVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "api-gateway"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "user-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /users/{user_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-193158529",
+          "operationConnectionHash" : "2053964614",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "XkVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "api-gateway"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "reservation-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-1765098594",
+          "operationConnectionHash" : "-874719522",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "X0VmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "api-gateway"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "reservation-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-1765098594",
+          "operationConnectionHash" : "-874719522",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "YEVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "api-gateway"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "reservation-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-1765098594",
+          "operationConnectionHash" : "-874719522",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "YUVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "api-gateway"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "reservation-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-1765098594",
+          "operationConnectionHash" : "-874719522",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "YkVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "reservation-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "room-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /rooms/{room_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-381109550",
+          "operationConnectionHash" : "129925337",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "Y0VmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "api-gateway"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "room-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "GET /rooms",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /rooms",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "363642735",
+          "operationConnectionHash" : "1653877263",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "ZEVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "api-gateway"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "user-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /users/{user_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-193158529",
+          "operationConnectionHash" : "2053964614",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "ZUVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "api-gateway"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "reservation-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-1765098594",
+          "operationConnectionHash" : "-874719522",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "ZkVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "reservation-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "room-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /rooms/{room_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-381109550",
+          "operationConnectionHash" : "129925337",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "Z0VmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "api-gateway"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "user-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /users/{user_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-193158529",
+          "operationConnectionHash" : "2053964614",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "aEVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "reservation-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "room-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /rooms/{room_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-381109550",
+          "operationConnectionHash" : "129925337",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "aUVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "reservation-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "room-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /rooms/{room_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-381109550",
+          "operationConnectionHash" : "129925337",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "akVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "api-gateway"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "user-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /users/{user_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-193158529",
+          "operationConnectionHash" : "2053964614",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "a0VmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "api-gateway"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "reservation-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-1765098594",
+          "operationConnectionHash" : "-874719522",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "bEVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "api-gateway"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "reservation-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "GET /availability",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /availability",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-1765098594",
+          "operationConnectionHash" : "-1753137122",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "bUVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "reservation-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "room-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /rooms/{room_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-381109550",
+          "operationConnectionHash" : "129925337",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "bkVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "reservation-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "room-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /rooms/{room_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-381109550",
+          "operationConnectionHash" : "129925337",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "b0VmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "api-gateway"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "user-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /users/{user_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-193158529",
+          "operationConnectionHash" : "2053964614",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "cEVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "api-gateway"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "user-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /users/{user_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-193158529",
+          "operationConnectionHash" : "2053964614",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "cUVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "api-gateway"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "user-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /users/{user_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-193158529",
+          "operationConnectionHash" : "2053964614",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "ckVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "reservation-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "room-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /rooms/{room_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-381109550",
+          "operationConnectionHash" : "129925337",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "c0VmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "user-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "GET /users/{user_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-945916250",
+          "operationConnectionHash" : "714742441",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "dEVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "api-gateway"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "reservation-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-1765098594",
+          "operationConnectionHash" : "-874719522",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "dUVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "api-gateway"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "reservation-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "GET /availability",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /availability",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-1765098594",
+          "operationConnectionHash" : "-1753137122",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "dkVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "reservation-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "room-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /rooms/{room_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-381109550",
+          "operationConnectionHash" : "129925337",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "d0VmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "api-gateway"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "room-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "GET /rooms",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /rooms",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "363642735",
+          "operationConnectionHash" : "1653877263",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "eEVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "reservation-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "room-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /rooms/{room_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-381109550",
+          "operationConnectionHash" : "129925337",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "eUVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "api-gateway"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "reservation-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "GET /availability",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /availability",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-1765098594",
+          "operationConnectionHash" : "-1753137122",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "ekVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "api-gateway"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "user-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /users/{user_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-193158529",
+          "operationConnectionHash" : "2053964614",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "e0VmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "reservation-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "room-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /rooms/{room_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-381109550",
+          "operationConnectionHash" : "129925337",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "fEVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "api-gateway"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "user-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /users/{user_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-193158529",
+          "operationConnectionHash" : "2053964614",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "fUVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "api-gateway"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "user-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /users/{user_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-193158529",
+          "operationConnectionHash" : "2053964614",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "fkVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "reservation-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "room-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /rooms/{room_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-381109550",
+          "operationConnectionHash" : "129925337",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "f0VmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "reservation-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "room-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /rooms/{room_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-381109550",
+          "operationConnectionHash" : "129925337",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "gEVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "reservation-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "room-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /rooms/{room_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-381109550",
+          "operationConnectionHash" : "129925337",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "gUVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "user-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "GET /users/{user_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-945916250",
+          "operationConnectionHash" : "714742441",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "gkVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "api-gateway"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "reservation-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-1765098594",
+          "operationConnectionHash" : "-874719522",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "g0VmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "reservation-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "room-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /rooms/{room_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-381109550",
+          "operationConnectionHash" : "129925337",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "hEVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "reservation-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "room-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /rooms/{room_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-381109550",
+          "operationConnectionHash" : "129925337",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "hUVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "api-gateway"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "user-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /users/{user_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-193158529",
+          "operationConnectionHash" : "2053964614",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "hkVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "api-gateway"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "user-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /users/{user_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-193158529",
+          "operationConnectionHash" : "2053964614",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "h0VmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "user-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "GET /users/{user_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-945916250",
+          "operationConnectionHash" : "714742441",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "iEVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "reservation-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "room-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /rooms/{room_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-381109550",
+          "operationConnectionHash" : "129925337",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "iUVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "reservation-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "room-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /rooms/{room_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-381109550",
+          "operationConnectionHash" : "129925337",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "ikVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "api-gateway"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "reservation-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "GET /availability",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /availability",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-1765098594",
+          "operationConnectionHash" : "-1753137122",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "i0VmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "api-gateway"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "room-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "GET /rooms",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /rooms",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "363642735",
+          "operationConnectionHash" : "1653877263",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "jEVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "reservation-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "room-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /rooms/{room_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-381109550",
+          "operationConnectionHash" : "129925337",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "jUVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "api-gateway"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "user-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /users/{user_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-193158529",
+          "operationConnectionHash" : "2053964614",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "jkVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "api-gateway"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "room-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "GET /rooms",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /rooms",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "363642735",
+          "operationConnectionHash" : "1653877263",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "j0VmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "api-gateway"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "reservation-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-1765098594",
+          "operationConnectionHash" : "-874719522",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "kEVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "reservation-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "room-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /rooms/{room_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-381109550",
+          "operationConnectionHash" : "129925337",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "kUVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "reservation-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "room-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /rooms/{room_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-381109550",
+          "operationConnectionHash" : "129925337",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "kkVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "reservation-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "room-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /rooms/{room_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-381109550",
+          "operationConnectionHash" : "129925337",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "k0VmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "user-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "GET /users/{user_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-945916250",
+          "operationConnectionHash" : "714742441",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "lEVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "api-gateway"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "user-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /users/{user_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-193158529",
+          "operationConnectionHash" : "2053964614",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "lUVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "api-gateway"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "user-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /users/{user_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-193158529",
+          "operationConnectionHash" : "2053964614",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "lkVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "reservation-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "room-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /rooms/{room_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-381109550",
+          "operationConnectionHash" : "129925337",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "l0VmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "api-gateway"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "reservation-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-1765098594",
+          "operationConnectionHash" : "-874719522",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "mEVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "user-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "GET /users/{user_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-945916250",
+          "operationConnectionHash" : "714742441",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "mUVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "api-gateway"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "reservation-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-1765098594",
+          "operationConnectionHash" : "-874719522",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "mkVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "api-gateway"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "reservation-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-1765098594",
+          "operationConnectionHash" : "-874719522",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "m0VmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "reservation-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "room-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /rooms/{room_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-381109550",
+          "operationConnectionHash" : "129925337",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "nEVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "reservation-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "room-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /rooms/{room_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-381109550",
+          "operationConnectionHash" : "129925337",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "nUVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "api-gateway"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "reservation-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-1765098594",
+          "operationConnectionHash" : "-874719522",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "nkVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "reservation-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "room-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /rooms/{room_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-381109550",
+          "operationConnectionHash" : "129925337",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "n0VmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "user-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "GET /users/{user_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-945916250",
+          "operationConnectionHash" : "714742441",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "oEVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "api-gateway"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "user-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /users/{user_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-193158529",
+          "operationConnectionHash" : "2053964614",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "oUVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "reservation-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "room-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /rooms/{room_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-381109550",
+          "operationConnectionHash" : "129925337",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "okVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "api-gateway"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "user-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /users/{user_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-193158529",
+          "operationConnectionHash" : "2053964614",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "o0VmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "user-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "GET /users/{user_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-945916250",
+          "operationConnectionHash" : "714742441",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "pEVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "api-gateway"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "user-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /users/{user_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-193158529",
+          "operationConnectionHash" : "2053964614",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "pUVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "user-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "GET /users/{user_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-945916250",
+          "operationConnectionHash" : "714742441",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "pkVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "api-gateway"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "user-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /users/{user_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-193158529",
+          "operationConnectionHash" : "2053964614",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "p0VmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "reservation-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "room-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /rooms/{room_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-381109550",
+          "operationConnectionHash" : "129925337",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "qEVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "api-gateway"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "room-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "GET /rooms",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /rooms",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "363642735",
+          "operationConnectionHash" : "1653877263",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "qUVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "api-gateway"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "reservation-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-1765098594",
+          "operationConnectionHash" : "-874719522",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "qkVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "api-gateway"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "reservation-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-1765098594",
+          "operationConnectionHash" : "-874719522",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "q0VmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "reservation-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "room-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /rooms/{room_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-381109550",
+          "operationConnectionHash" : "129925337",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "rEVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "api-gateway"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "reservation-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "GET /availability",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /availability",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-1765098594",
+          "operationConnectionHash" : "-1753137122",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "rUVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "user-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "GET /users/{user_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-945916250",
+          "operationConnectionHash" : "714742441",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "rkVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "reservation-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "room-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /rooms/{room_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-381109550",
+          "operationConnectionHash" : "129925337",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "r0VmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "user-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "GET /users/{user_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-945916250",
+          "operationConnectionHash" : "714742441",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "sEVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "user-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "GET /users/{user_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-945916250",
+          "operationConnectionHash" : "714742441",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "sUVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "api-gateway"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "room-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "GET /rooms",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /rooms",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "363642735",
+          "operationConnectionHash" : "1653877263",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "skVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "reservation-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "room-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /rooms/{room_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-381109550",
+          "operationConnectionHash" : "129925337",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "s0VmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "reservation-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "room-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /rooms/{room_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-381109550",
+          "operationConnectionHash" : "129925337",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "tEVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "user-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "GET /users/{user_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-945916250",
+          "operationConnectionHash" : "714742441",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "tUVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "reservation-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "room-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "POST /reservations",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /rooms/{room_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-381109550",
+          "operationConnectionHash" : "129925337",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "tkVmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "user-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "GET /users/{user_id}",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-945916250",
+          "operationConnectionHash" : "714742441",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      },
+      {
+        "_index" : "otel-v2-apm-service-map-000001",
+        "_id" : "t0VmW54BWdV9Nppj3WyH",
+        "_score" : 1.0,
+        "_source" : {
+          "sourceNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "api-gateway"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "targetNode" : {
+            "type" : "service",
+            "keyAttributes" : {
+              "environment" : "generic:default",
+              "name" : "reservation-service"
+            },
+            "groupByAttributes" : {
+              "telemetry.sdk.language" : "python"
+            }
+          },
+          "sourceOperation" : {
+            "name" : "GET /availability",
+            "attributes" : { }
+          },
+          "targetOperation" : {
+            "name" : "GET /availability",
+            "attributes" : { }
+          },
+          "nodeConnectionHash" : "-1765098594",
+          "operationConnectionHash" : "-1753137122",
+          "timestamp" : "2026-05-24T19:11:00Z"
+        }
+      }
+    ]
+  }
+}

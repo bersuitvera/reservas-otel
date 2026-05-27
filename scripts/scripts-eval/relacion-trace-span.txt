@@ -1,0 +1,714 @@
+{
+  "took" : 8,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 3,
+    "successful" : 3,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : {
+      "value" : 31,
+      "relation" : "eq"
+    },
+    "max_score" : null,
+    "hits" : [
+      {
+        "_index" : "otel-v1-apm-span-000002",
+        "_id" : "627f7efc5cacc909694cf2fa7928bb4e/c6b3e42d2d07ca8c",
+        "_score" : null,
+        "_source" : {
+          "traceId" : "627f7efc5cacc909694cf2fa7928bb4e",
+          "spanId" : "c6b3e42d2d07ca8c",
+          "kind" : "SPAN_KIND_SERVER",
+          "name" : "POST /reservations",
+          "startTime" : "2026-05-26T17:14:00.306710690Z",
+          "attributes" : {
+            "http.status_code" : 200,
+            "http.route" : "/reservations",
+            "http.method" : "POST"
+          },
+          "durationInNanos" : 23398585,
+          "serviceName" : "api-gateway",
+          "parentSpanId" : "",
+          "status" : {
+            "code" : 0
+          }
+        },
+        "sort" : [
+          1779815640306710690
+        ]
+      },
+      {
+        "_index" : "otel-v1-apm-span-000002",
+        "_id" : "627f7efc5cacc909694cf2fa7928bb4e/8df72562075b5b3b",
+        "_score" : null,
+        "_source" : {
+          "traceId" : "627f7efc5cacc909694cf2fa7928bb4e",
+          "spanId" : "8df72562075b5b3b",
+          "kind" : "SPAN_KIND_INTERNAL",
+          "name" : "POST /reservations http receive",
+          "startTime" : "2026-05-26T17:14:00.306835048Z",
+          "durationInNanos" : 12422,
+          "serviceName" : "api-gateway",
+          "parentSpanId" : "c6b3e42d2d07ca8c",
+          "status" : {
+            "code" : 0
+          }
+        },
+        "sort" : [
+          1779815640306835048
+        ]
+      },
+      {
+        "_index" : "otel-v1-apm-span-000002",
+        "_id" : "627f7efc5cacc909694cf2fa7928bb4e/72f897fb77be3867",
+        "_score" : null,
+        "_source" : {
+          "traceId" : "627f7efc5cacc909694cf2fa7928bb4e",
+          "spanId" : "72f897fb77be3867",
+          "kind" : "SPAN_KIND_CLIENT",
+          "name" : "GET",
+          "startTime" : "2026-05-26T17:14:00.307154632Z",
+          "attributes" : {
+            "http.status_code" : 200,
+            "http.method" : "GET"
+          },
+          "durationInNanos" : 2370041,
+          "serviceName" : "api-gateway",
+          "parentSpanId" : "c6b3e42d2d07ca8c",
+          "status" : {
+            "code" : 0
+          }
+        },
+        "sort" : [
+          1779815640307154632
+        ]
+      },
+      {
+        "_index" : "otel-v1-apm-span-000002",
+        "_id" : "627f7efc5cacc909694cf2fa7928bb4e/d3f0658a080cedc6",
+        "_score" : null,
+        "_source" : {
+          "traceId" : "627f7efc5cacc909694cf2fa7928bb4e",
+          "spanId" : "d3f0658a080cedc6",
+          "kind" : "SPAN_KIND_SERVER",
+          "name" : "GET /users/{user_id}",
+          "startTime" : "2026-05-26T17:14:00.308088428Z",
+          "attributes" : {
+            "http.status_code" : 200,
+            "http.route" : "/users/{user_id}",
+            "http.method" : "GET"
+          },
+          "durationInNanos" : 1105080,
+          "serviceName" : "user-service",
+          "parentSpanId" : "72f897fb77be3867",
+          "status" : {
+            "code" : 0
+          }
+        },
+        "sort" : [
+          1779815640308088428
+        ]
+      },
+      {
+        "_index" : "otel-v1-apm-span-000002",
+        "_id" : "627f7efc5cacc909694cf2fa7928bb4e/4ff8f2c5ef3728e3",
+        "_score" : null,
+        "_source" : {
+          "traceId" : "627f7efc5cacc909694cf2fa7928bb4e",
+          "spanId" : "4ff8f2c5ef3728e3",
+          "kind" : "SPAN_KIND_INTERNAL",
+          "name" : "user.lookup",
+          "startTime" : "2026-05-26T17:14:00.308585216Z",
+          "durationInNanos" : 28563,
+          "serviceName" : "user-service",
+          "parentSpanId" : "d3f0658a080cedc6",
+          "status" : {
+            "code" : 0
+          }
+        },
+        "sort" : [
+          1779815640308585216
+        ]
+      },
+      {
+        "_index" : "otel-v1-apm-span-000002",
+        "_id" : "627f7efc5cacc909694cf2fa7928bb4e/977ccada7f857b50",
+        "_score" : null,
+        "_source" : {
+          "traceId" : "627f7efc5cacc909694cf2fa7928bb4e",
+          "spanId" : "977ccada7f857b50",
+          "kind" : "SPAN_KIND_INTERNAL",
+          "name" : "GET /users/{user_id} http send",
+          "startTime" : "2026-05-26T17:14:00.308853707Z",
+          "attributes" : {
+            "http.status_code" : 200
+          },
+          "durationInNanos" : 35956,
+          "serviceName" : "user-service",
+          "parentSpanId" : "d3f0658a080cedc6",
+          "status" : {
+            "code" : 0
+          }
+        },
+        "sort" : [
+          1779815640308853707
+        ]
+      },
+      {
+        "_index" : "otel-v1-apm-span-000002",
+        "_id" : "627f7efc5cacc909694cf2fa7928bb4e/8d61594340aaba1d",
+        "_score" : null,
+        "_source" : {
+          "traceId" : "627f7efc5cacc909694cf2fa7928bb4e",
+          "spanId" : "8d61594340aaba1d",
+          "kind" : "SPAN_KIND_INTERNAL",
+          "name" : "GET /users/{user_id} http send",
+          "startTime" : "2026-05-26T17:14:00.309145110Z",
+          "durationInNanos" : 13424,
+          "serviceName" : "user-service",
+          "parentSpanId" : "d3f0658a080cedc6",
+          "status" : {
+            "code" : 0
+          }
+        },
+        "sort" : [
+          1779815640309145110
+        ]
+      },
+      {
+        "_index" : "otel-v1-apm-span-000002",
+        "_id" : "627f7efc5cacc909694cf2fa7928bb4e/0b457c44a338c184",
+        "_score" : null,
+        "_source" : {
+          "traceId" : "627f7efc5cacc909694cf2fa7928bb4e",
+          "spanId" : "0b457c44a338c184",
+          "kind" : "SPAN_KIND_CLIENT",
+          "name" : "POST",
+          "startTime" : "2026-05-26T17:14:00.310136542Z",
+          "attributes" : {
+            "http.status_code" : 200,
+            "http.method" : "POST"
+          },
+          "durationInNanos" : 18888782,
+          "serviceName" : "api-gateway",
+          "parentSpanId" : "c6b3e42d2d07ca8c",
+          "status" : {
+            "code" : 0
+          }
+        },
+        "sort" : [
+          1779815640310136542
+        ]
+      },
+      {
+        "_index" : "otel-v1-apm-span-000002",
+        "_id" : "627f7efc5cacc909694cf2fa7928bb4e/9331ea817fda4e4e",
+        "_score" : null,
+        "_source" : {
+          "traceId" : "627f7efc5cacc909694cf2fa7928bb4e",
+          "spanId" : "9331ea817fda4e4e",
+          "kind" : "SPAN_KIND_SERVER",
+          "name" : "POST /reservations",
+          "startTime" : "2026-05-26T17:14:00.310812487Z",
+          "attributes" : {
+            "http.status_code" : 200,
+            "http.route" : "/reservations",
+            "http.method" : "POST"
+          },
+          "durationInNanos" : 17822814,
+          "serviceName" : "reservation-service",
+          "parentSpanId" : "0b457c44a338c184",
+          "status" : {
+            "code" : 0
+          }
+        },
+        "sort" : [
+          1779815640310812487
+        ]
+      },
+      {
+        "_index" : "otel-v1-apm-span-000002",
+        "_id" : "627f7efc5cacc909694cf2fa7928bb4e/f727b3015d454e1d",
+        "_score" : null,
+        "_source" : {
+          "traceId" : "627f7efc5cacc909694cf2fa7928bb4e",
+          "spanId" : "f727b3015d454e1d",
+          "kind" : "SPAN_KIND_INTERNAL",
+          "name" : "POST /reservations http receive",
+          "startTime" : "2026-05-26T17:14:00.310949537Z",
+          "durationInNanos" : 53308,
+          "serviceName" : "reservation-service",
+          "parentSpanId" : "9331ea817fda4e4e",
+          "status" : {
+            "code" : 0
+          }
+        },
+        "sort" : [
+          1779815640310949537
+        ]
+      },
+      {
+        "_index" : "otel-v1-apm-span-000002",
+        "_id" : "627f7efc5cacc909694cf2fa7928bb4e/0208b1d9b84ce4d8",
+        "_score" : null,
+        "_source" : {
+          "traceId" : "627f7efc5cacc909694cf2fa7928bb4e",
+          "spanId" : "0208b1d9b84ce4d8",
+          "kind" : "SPAN_KIND_INTERNAL",
+          "name" : "reservation.flow.create",
+          "startTime" : "2026-05-26T17:14:00.311347885Z",
+          "durationInNanos" : 16946513,
+          "serviceName" : "reservation-service",
+          "parentSpanId" : "9331ea817fda4e4e",
+          "status" : {
+            "code" : 0
+          }
+        },
+        "sort" : [
+          1779815640311347885
+        ]
+      },
+      {
+        "_index" : "otel-v1-apm-span-000002",
+        "_id" : "627f7efc5cacc909694cf2fa7928bb4e/b6d87ed307c55f5a",
+        "_score" : null,
+        "_source" : {
+          "traceId" : "627f7efc5cacc909694cf2fa7928bb4e",
+          "spanId" : "b6d87ed307c55f5a",
+          "kind" : "SPAN_KIND_INTERNAL",
+          "name" : "reservation.validate.room",
+          "startTime" : "2026-05-26T17:14:00.311417823Z",
+          "durationInNanos" : 4505455,
+          "serviceName" : "reservation-service",
+          "parentSpanId" : "0208b1d9b84ce4d8",
+          "status" : {
+            "code" : 0
+          }
+        },
+        "sort" : [
+          1779815640311417823
+        ]
+      },
+      {
+        "_index" : "otel-v1-apm-span-000002",
+        "_id" : "627f7efc5cacc909694cf2fa7928bb4e/75e11379be300a45",
+        "_score" : null,
+        "_source" : {
+          "traceId" : "627f7efc5cacc909694cf2fa7928bb4e",
+          "spanId" : "75e11379be300a45",
+          "kind" : "SPAN_KIND_CLIENT",
+          "name" : "GET",
+          "startTime" : "2026-05-26T17:14:00.311814318Z",
+          "attributes" : {
+            "http.status_code" : 200,
+            "http.method" : "GET"
+          },
+          "durationInNanos" : 3724237,
+          "serviceName" : "reservation-service",
+          "parentSpanId" : "b6d87ed307c55f5a",
+          "status" : {
+            "code" : 0
+          }
+        },
+        "sort" : [
+          1779815640311814318
+        ]
+      },
+      {
+        "_index" : "otel-v1-apm-span-000002",
+        "_id" : "627f7efc5cacc909694cf2fa7928bb4e/96305170e7866f6f",
+        "_score" : null,
+        "_source" : {
+          "traceId" : "627f7efc5cacc909694cf2fa7928bb4e",
+          "spanId" : "96305170e7866f6f",
+          "kind" : "SPAN_KIND_SERVER",
+          "name" : "GET /rooms/{room_id}",
+          "startTime" : "2026-05-26T17:14:00.312614410Z",
+          "attributes" : {
+            "http.status_code" : 200,
+            "http.route" : "/rooms/{room_id}",
+            "http.method" : "GET"
+          },
+          "durationInNanos" : 2475314,
+          "serviceName" : "room-service",
+          "parentSpanId" : "75e11379be300a45",
+          "status" : {
+            "code" : 0
+          }
+        },
+        "sort" : [
+          1779815640312614410
+        ]
+      },
+      {
+        "_index" : "otel-v1-apm-span-000002",
+        "_id" : "627f7efc5cacc909694cf2fa7928bb4e/bed0c44d9dac270a",
+        "_score" : null,
+        "_source" : {
+          "traceId" : "627f7efc5cacc909694cf2fa7928bb4e",
+          "spanId" : "bed0c44d9dac270a",
+          "kind" : "SPAN_KIND_INTERNAL",
+          "name" : "room.detail",
+          "startTime" : "2026-05-26T17:14:00.313212604Z",
+          "durationInNanos" : 1494381,
+          "serviceName" : "room-service",
+          "parentSpanId" : "96305170e7866f6f",
+          "status" : {
+            "code" : 0
+          }
+        },
+        "sort" : [
+          1779815640313212604
+        ]
+      },
+      {
+        "_index" : "otel-v1-apm-span-000002",
+        "_id" : "627f7efc5cacc909694cf2fa7928bb4e/51801dce8a63cc8e",
+        "_score" : null,
+        "_source" : {
+          "traceId" : "627f7efc5cacc909694cf2fa7928bb4e",
+          "spanId" : "51801dce8a63cc8e",
+          "kind" : "SPAN_KIND_CLIENT",
+          "name" : "connect",
+          "startTime" : "2026-05-26T17:14:00.313300574Z",
+          "durationInNanos" : 402887,
+          "serviceName" : "room-service",
+          "parentSpanId" : "bed0c44d9dac270a",
+          "status" : {
+            "code" : 0
+          }
+        },
+        "sort" : [
+          1779815640313300574
+        ]
+      },
+      {
+        "_index" : "otel-v1-apm-span-000002",
+        "_id" : "627f7efc5cacc909694cf2fa7928bb4e/2931e16287b81415",
+        "_score" : null,
+        "_source" : {
+          "traceId" : "627f7efc5cacc909694cf2fa7928bb4e",
+          "spanId" : "2931e16287b81415",
+          "kind" : "SPAN_KIND_CLIENT",
+          "name" : "SELECT reservas_db",
+          "startTime" : "2026-05-26T17:14:00.313989003Z",
+          "durationInNanos" : 353746,
+          "serviceName" : "room-service",
+          "parentSpanId" : "bed0c44d9dac270a",
+          "status" : {
+            "code" : 0
+          }
+        },
+        "sort" : [
+          1779815640313989003
+        ]
+      },
+      {
+        "_index" : "otel-v1-apm-span-000002",
+        "_id" : "627f7efc5cacc909694cf2fa7928bb4e/b9bce93dacca025b",
+        "_score" : null,
+        "_source" : {
+          "traceId" : "627f7efc5cacc909694cf2fa7928bb4e",
+          "spanId" : "b9bce93dacca025b",
+          "kind" : "SPAN_KIND_INTERNAL",
+          "name" : "GET /rooms/{room_id} http send",
+          "startTime" : "2026-05-26T17:14:00.314856408Z",
+          "attributes" : {
+            "http.status_code" : 200
+          },
+          "durationInNanos" : 25697,
+          "serviceName" : "room-service",
+          "parentSpanId" : "96305170e7866f6f",
+          "status" : {
+            "code" : 0
+          }
+        },
+        "sort" : [
+          1779815640314856408
+        ]
+      },
+      {
+        "_index" : "otel-v1-apm-span-000002",
+        "_id" : "627f7efc5cacc909694cf2fa7928bb4e/5da0c25053a1cc72",
+        "_score" : null,
+        "_source" : {
+          "traceId" : "627f7efc5cacc909694cf2fa7928bb4e",
+          "spanId" : "5da0c25053a1cc72",
+          "kind" : "SPAN_KIND_INTERNAL",
+          "name" : "GET /rooms/{room_id} http send",
+          "startTime" : "2026-05-26T17:14:00.315062845Z",
+          "durationInNanos" : 7033,
+          "serviceName" : "room-service",
+          "parentSpanId" : "96305170e7866f6f",
+          "status" : {
+            "code" : 0
+          }
+        },
+        "sort" : [
+          1779815640315062845
+        ]
+      },
+      {
+        "_index" : "otel-v1-apm-span-000002",
+        "_id" : "627f7efc5cacc909694cf2fa7928bb4e/d4c3b85054a751a8",
+        "_score" : null,
+        "_source" : {
+          "traceId" : "627f7efc5cacc909694cf2fa7928bb4e",
+          "spanId" : "d4c3b85054a751a8",
+          "kind" : "SPAN_KIND_INTERNAL",
+          "name" : "reservation.check.availability",
+          "startTime" : "2026-05-26T17:14:00.315998425Z",
+          "durationInNanos" : 11698320,
+          "serviceName" : "reservation-service",
+          "parentSpanId" : "0208b1d9b84ce4d8",
+          "status" : {
+            "code" : 0
+          }
+        },
+        "sort" : [
+          1779815640315998425
+        ]
+      },
+      {
+        "_index" : "otel-v1-apm-span-000002",
+        "_id" : "627f7efc5cacc909694cf2fa7928bb4e/ddeb2d47aaac3d16",
+        "_score" : null,
+        "_source" : {
+          "traceId" : "627f7efc5cacc909694cf2fa7928bb4e",
+          "spanId" : "ddeb2d47aaac3d16",
+          "kind" : "SPAN_KIND_CLIENT",
+          "name" : "connect",
+          "startTime" : "2026-05-26T17:14:00.316060158Z",
+          "durationInNanos" : 282156,
+          "serviceName" : "reservation-service",
+          "parentSpanId" : "d4c3b85054a751a8",
+          "status" : {
+            "code" : 0
+          }
+        },
+        "sort" : [
+          1779815640316060158
+        ]
+      },
+      {
+        "_index" : "otel-v1-apm-span-000002",
+        "_id" : "627f7efc5cacc909694cf2fa7928bb4e/e4c4420c3b081102",
+        "_score" : null,
+        "_source" : {
+          "traceId" : "627f7efc5cacc909694cf2fa7928bb4e",
+          "spanId" : "e4c4420c3b081102",
+          "kind" : "SPAN_KIND_CLIENT",
+          "name" : "SELECT reservas_db",
+          "startTime" : "2026-05-26T17:14:00.316596368Z",
+          "durationInNanos" : 2782345,
+          "serviceName" : "reservation-service",
+          "parentSpanId" : "d4c3b85054a751a8",
+          "status" : {
+            "code" : 0
+          }
+        },
+        "sort" : [
+          1779815640316596368
+        ]
+      },
+      {
+        "_index" : "otel-v1-apm-span-000002",
+        "_id" : "627f7efc5cacc909694cf2fa7928bb4e/7e1d210d6d28d169",
+        "_score" : null,
+        "_source" : {
+          "traceId" : "627f7efc5cacc909694cf2fa7928bb4e",
+          "spanId" : "7e1d210d6d28d169",
+          "kind" : "SPAN_KIND_INTERNAL",
+          "name" : "reservation.persist.confirmed",
+          "startTime" : "2026-05-26T17:14:00.319601380Z",
+          "durationInNanos" : 550206,
+          "serviceName" : "reservation-service",
+          "parentSpanId" : "d4c3b85054a751a8",
+          "status" : {
+            "code" : 0
+          }
+        },
+        "sort" : [
+          1779815640319601380
+        ]
+      },
+      {
+        "_index" : "otel-v1-apm-span-000002",
+        "_id" : "627f7efc5cacc909694cf2fa7928bb4e/95ee27d3311f6c68",
+        "_score" : null,
+        "_source" : {
+          "traceId" : "627f7efc5cacc909694cf2fa7928bb4e",
+          "spanId" : "95ee27d3311f6c68",
+          "kind" : "SPAN_KIND_CLIENT",
+          "name" : "INSERT reservas_db",
+          "startTime" : "2026-05-26T17:14:00.319798120Z",
+          "durationInNanos" : 270474,
+          "serviceName" : "reservation-service",
+          "parentSpanId" : "7e1d210d6d28d169",
+          "status" : {
+            "code" : 0
+          }
+        },
+        "sort" : [
+          1779815640319798120
+        ]
+      },
+      {
+        "_index" : "otel-v1-apm-span-000002",
+        "_id" : "627f7efc5cacc909694cf2fa7928bb4e/7beb8a3dd2b1daf0",
+        "_score" : null,
+        "_source" : {
+          "traceId" : "627f7efc5cacc909694cf2fa7928bb4e",
+          "spanId" : "7beb8a3dd2b1daf0",
+          "kind" : "SPAN_KIND_PRODUCER",
+          "name" : "reservation.event.publish",
+          "startTime" : "2026-05-26T17:14:00.327805033Z",
+          "durationInNanos" : 475980,
+          "serviceName" : "reservation-service",
+          "parentSpanId" : "0208b1d9b84ce4d8",
+          "status" : {
+            "code" : 0
+          }
+        },
+        "sort" : [
+          1779815640327805033
+        ]
+      },
+      {
+        "_index" : "otel-v1-apm-span-000002",
+        "_id" : "627f7efc5cacc909694cf2fa7928bb4e/cf41555f8b1ac351",
+        "_score" : null,
+        "_source" : {
+          "traceId" : "627f7efc5cacc909694cf2fa7928bb4e",
+          "spanId" : "cf41555f8b1ac351",
+          "kind" : "SPAN_KIND_CLIENT",
+          "name" : "XADD",
+          "startTime" : "2026-05-26T17:14:00.327918080Z",
+          "durationInNanos" : 337617,
+          "serviceName" : "reservation-service",
+          "parentSpanId" : "7beb8a3dd2b1daf0",
+          "status" : {
+            "code" : 0
+          }
+        },
+        "sort" : [
+          1779815640327918080
+        ]
+      },
+      {
+        "_index" : "otel-v1-apm-span-000002",
+        "_id" : "627f7efc5cacc909694cf2fa7928bb4e/f03136649a3054dc",
+        "_score" : null,
+        "_source" : {
+          "traceId" : "627f7efc5cacc909694cf2fa7928bb4e",
+          "spanId" : "f03136649a3054dc",
+          "kind" : "SPAN_KIND_INTERNAL",
+          "name" : "POST /reservations http send",
+          "startTime" : "2026-05-26T17:14:00.328433833Z",
+          "attributes" : {
+            "http.status_code" : 200
+          },
+          "durationInNanos" : 18904,
+          "serviceName" : "reservation-service",
+          "parentSpanId" : "9331ea817fda4e4e",
+          "status" : {
+            "code" : 0
+          }
+        },
+        "sort" : [
+          1779815640328433833
+        ]
+      },
+      {
+        "_index" : "otel-v1-apm-span-000002",
+        "_id" : "627f7efc5cacc909694cf2fa7928bb4e/80d2d9f03aa00c9d",
+        "_score" : null,
+        "_source" : {
+          "traceId" : "627f7efc5cacc909694cf2fa7928bb4e",
+          "spanId" : "80d2d9f03aa00c9d",
+          "kind" : "SPAN_KIND_CONSUMER",
+          "name" : "notification.consume.reservation_created",
+          "startTime" : "2026-05-26T17:14:00.328545467Z",
+          "durationInNanos" : 50519812,
+          "serviceName" : "notification-service",
+          "parentSpanId" : "7beb8a3dd2b1daf0",
+          "status" : {
+            "code" : 0
+          }
+        },
+        "sort" : [
+          1779815640328545467
+        ]
+      },
+      {
+        "_index" : "otel-v1-apm-span-000002",
+        "_id" : "627f7efc5cacc909694cf2fa7928bb4e/998c47fb10188945",
+        "_score" : null,
+        "_source" : {
+          "traceId" : "627f7efc5cacc909694cf2fa7928bb4e",
+          "spanId" : "998c47fb10188945",
+          "kind" : "SPAN_KIND_INTERNAL",
+          "name" : "POST /reservations http send",
+          "startTime" : "2026-05-26T17:14:00.328608853Z",
+          "durationInNanos" : 6852,
+          "serviceName" : "reservation-service",
+          "parentSpanId" : "9331ea817fda4e4e",
+          "status" : {
+            "code" : 0
+          }
+        },
+        "sort" : [
+          1779815640328608853
+        ]
+      },
+      {
+        "_index" : "otel-v1-apm-span-000002",
+        "_id" : "627f7efc5cacc909694cf2fa7928bb4e/e225563f0056ad2d",
+        "_score" : null,
+        "_source" : {
+          "traceId" : "627f7efc5cacc909694cf2fa7928bb4e",
+          "spanId" : "e225563f0056ad2d",
+          "kind" : "SPAN_KIND_INTERNAL",
+          "name" : "POST /reservations http send",
+          "startTime" : "2026-05-26T17:14:00.329837017Z",
+          "attributes" : {
+            "http.status_code" : 200
+          },
+          "durationInNanos" : 28753,
+          "serviceName" : "api-gateway",
+          "parentSpanId" : "c6b3e42d2d07ca8c",
+          "status" : {
+            "code" : 0
+          }
+        },
+        "sort" : [
+          1779815640329837017
+        ]
+      },
+      {
+        "_index" : "otel-v1-apm-span-000002",
+        "_id" : "627f7efc5cacc909694cf2fa7928bb4e/cd369703c9a109ff",
+        "_score" : null,
+        "_source" : {
+          "traceId" : "627f7efc5cacc909694cf2fa7928bb4e",
+          "spanId" : "cd369703c9a109ff",
+          "kind" : "SPAN_KIND_INTERNAL",
+          "name" : "POST /reservations http send",
+          "startTime" : "2026-05-26T17:14:00.330064964Z",
+          "durationInNanos" : 12623,
+          "serviceName" : "api-gateway",
+          "parentSpanId" : "c6b3e42d2d07ca8c",
+          "status" : {
+            "code" : 0
+          }
+        },
+        "sort" : [
+          1779815640330064964
+        ]
+      }
+    ]
+  }
+}

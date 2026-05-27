@@ -1,0 +1,157 @@
+{
+  "took" : 17,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 3,
+    "successful" : 3,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : {
+      "value" : 3,
+      "relation" : "eq"
+    },
+    "max_score" : null,
+    "hits" : [
+      {
+        "_index" : "logs-otel-v1-000002",
+        "_id" : "olJHZZ4BADHVqMbDgUA3",
+        "_score" : null,
+        "_source" : {
+          "traceId" : "627f7efc5cacc909694cf2fa7928bb4e",
+          "instrumentationScope" : {
+            "name" : "httpx",
+            "droppedAttributesCount" : 0
+          },
+          "resource" : {
+            "schemaUrl" : "https://opentelemetry.io/schemas/1.40.0",
+            "attributes" : {
+              "deployment.environment.name" : "dev",
+              "telemetry.sdk.language" : "python",
+              "service.name" : "api-gateway",
+              "service.version" : "0.1.0",
+              "service.instance.id" : "a50a6077b76b",
+              "telemetry.sdk.version" : "1.40.0",
+              "host.name" : "145b643c6a1d",
+              "os.type" : "linux",
+              "service.namespace" : "reservas",
+              "telemetry.sdk.name" : "opentelemetry"
+            },
+            "droppedAttributesCount" : 0
+          },
+          "flags" : 1,
+          "severityNumber" : 9,
+          "body" : "HTTP Request: GET http://user-service:8000/users/1 \"HTTP/1.1 200 OK\"",
+          "schemaUrl" : "",
+          "spanId" : "c6b3e42d2d07ca8c",
+          "severityText" : "INFO",
+          "attributes" : {
+            "code.file.path" : "/usr/local/lib/python3.12/site-packages/httpx/_client.py",
+            "code.function.name" : "_send_single_request",
+            "code.line.number" : 1740
+          },
+          "time" : "2026-05-26T17:14:00.309609216Z",
+          "droppedAttributesCount" : 0,
+          "observedTimestamp" : "2026-05-26T17:14:00.309631208Z",
+          "@timestamp" : "2026-05-26T17:14:00.309609216Z"
+        },
+        "sort" : [
+          1779815640309609216
+        ]
+      },
+      {
+        "_index" : "logs-otel-v1-000002",
+        "_id" : "e1JHZZ4BADHVqMbDgUA3",
+        "_score" : null,
+        "_source" : {
+          "traceId" : "627f7efc5cacc909694cf2fa7928bb4e",
+          "instrumentationScope" : {
+            "name" : "httpx",
+            "droppedAttributesCount" : 0
+          },
+          "resource" : {
+            "schemaUrl" : "https://opentelemetry.io/schemas/1.40.0",
+            "attributes" : {
+              "deployment.environment.name" : "dev",
+              "telemetry.sdk.language" : "python",
+              "service.name" : "reservation-service",
+              "service.version" : "0.1.0",
+              "service.instance.id" : "bd0f6b9c72ef",
+              "telemetry.sdk.version" : "1.40.0",
+              "host.name" : "145b643c6a1d",
+              "os.type" : "linux",
+              "service.namespace" : "reservas",
+              "telemetry.sdk.name" : "opentelemetry"
+            },
+            "droppedAttributesCount" : 0
+          },
+          "flags" : 1,
+          "severityNumber" : 9,
+          "body" : "HTTP Request: GET http://room-service:8000/rooms/2 \"HTTP/1.1 200 OK\"",
+          "schemaUrl" : "",
+          "spanId" : "b6d87ed307c55f5a",
+          "severityText" : "INFO",
+          "attributes" : {
+            "code.file.path" : "/usr/local/lib/python3.12/site-packages/httpx/_client.py",
+            "code.function.name" : "_send_single_request",
+            "code.line.number" : 1025
+          },
+          "time" : "2026-05-26T17:14:00.315682048Z",
+          "droppedAttributesCount" : 0,
+          "observedTimestamp" : "2026-05-26T17:14:00.315721068Z",
+          "@timestamp" : "2026-05-26T17:14:00.315682048Z"
+        },
+        "sort" : [
+          1779815640315682048
+        ]
+      },
+      {
+        "_index" : "logs-otel-v1-000002",
+        "_id" : "o1JHZZ4BADHVqMbDgUA3",
+        "_score" : null,
+        "_source" : {
+          "traceId" : "627f7efc5cacc909694cf2fa7928bb4e",
+          "instrumentationScope" : {
+            "name" : "httpx",
+            "droppedAttributesCount" : 0
+          },
+          "resource" : {
+            "schemaUrl" : "https://opentelemetry.io/schemas/1.40.0",
+            "attributes" : {
+              "deployment.environment.name" : "dev",
+              "telemetry.sdk.language" : "python",
+              "service.name" : "api-gateway",
+              "service.version" : "0.1.0",
+              "service.instance.id" : "a50a6077b76b",
+              "telemetry.sdk.version" : "1.40.0",
+              "host.name" : "145b643c6a1d",
+              "os.type" : "linux",
+              "service.namespace" : "reservas",
+              "telemetry.sdk.name" : "opentelemetry"
+            },
+            "droppedAttributesCount" : 0
+          },
+          "flags" : 1,
+          "severityNumber" : 9,
+          "body" : "HTTP Request: POST http://reservation-service:8000/reservations \"HTTP/1.1 200 OK\"",
+          "schemaUrl" : "",
+          "spanId" : "c6b3e42d2d07ca8c",
+          "severityText" : "INFO",
+          "attributes" : {
+            "code.file.path" : "/usr/local/lib/python3.12/site-packages/httpx/_client.py",
+            "code.function.name" : "_send_single_request",
+            "code.line.number" : 1740
+          },
+          "time" : "2026-05-26T17:14:00.329155584Z",
+          "droppedAttributesCount" : 0,
+          "observedTimestamp" : "2026-05-26T17:14:00.329182761Z",
+          "@timestamp" : "2026-05-26T17:14:00.329155584Z"
+        },
+        "sort" : [
+          1779815640329155584
+        ]
+      }
+    ]
+  }
+}
