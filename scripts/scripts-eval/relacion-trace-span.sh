@@ -58,6 +58,26 @@ latest_elastic_trace_id() {
 JSON
 }
 
+latest_elastic_apm_trace_id() {
+  search_json "${TRACE_INDEX_PATTERN:-traces-apm*}" <<'JSON' | jq -r '.hits.hits[0]._source.trace.id // empty'
+{
+  "size": 1,
+  "_source": ["trace.id"],
+  "query": {
+    "bool": {
+      "must": [
+        { "exists": { "field": "trace.id" } },
+        { "exists": { "field": "parent.id" } }
+      ]
+    }
+  },
+  "sort": [
+    { "@timestamp": { "order": "desc" } }
+  ]
+}
+JSON
+}
+
 latest_opensearch_trace_id() {
   search_json "${TRACE_INDEX_PATTERN:-otel-v1-apm-span-*}" <<'JSON' | jq -r '.hits.hits[0]._source.traceId // empty'
 {
@@ -121,6 +141,52 @@ query_elastic_trace() {
 JSON
 }
 
+query_elastic_apm_trace() {
+  local trace_id="$1"
+  search_json "${TRACE_INDEX_PATTERN:-traces-apm*}" <<JSON | jq '. as $root | {
+  total: $root.hits.total,
+  spans: [
+    $root.hits.hits[] | {
+      index: ._index,
+      timestamp: ._source["@timestamp"],
+      trace_id: ._source.trace.id,
+      span_id: (._source.span.id // ._source.transaction.id),
+      parent_span_id: ._source.parent.id,
+      service_name: ._source.service.name,
+      name: (._source.span.name // ._source.transaction.name),
+      kind: (._source.span.type // ._source.transaction.type),
+      subtype: ._source.span.subtype,
+      action: ._source.span.action,
+      duration_us: (._source.span.duration.us // ._source.transaction.duration.us),
+      outcome: ._source.event.outcome,
+      processor_event: ._source.processor.event,
+      http_method: ._source.http.request.method,
+      http_route: (._source.transaction.name // ._source.url.path),
+      http_status_code: ._source.http.response.status_code,
+      app_user_id: (._source.labels.app_user_id // ._source.numeric_labels.app_user_id),
+      app_room_id: (._source.labels.app_room_id // ._source.numeric_labels.app_room_id),
+      app_reservation_id: (._source.labels.app_reservation_id // ._source.numeric_labels.app_reservation_id),
+      app_reservation_status: ._source.labels.app_reservation_status,
+      app_event_type: ._source.labels.app_event_type,
+      app_received_traceparent: ._source.labels.app_received_traceparent
+    }
+  ]
+}'
+{
+  "size": ${SIZE},
+  "query": {
+    "term": {
+      "trace.id": "${trace_id}"
+    }
+  },
+  "sort": [
+    { "@timestamp": { "order": "asc" } },
+    { "timestamp.us": { "order": "asc", "unmapped_type": "long" } }
+  ]
+}
+JSON
+}
+
 query_opensearch_trace() {
   local trace_id="$1"
   search_json "${TRACE_INDEX_PATTERN:-otel-v1-apm-span-*}" <<JSON
@@ -153,7 +219,7 @@ JSON
 }
 
 case "${SCENARIO:-}" in
-  escenario_b|escenario_c)
+  escenario_b)
     if [[ -z "$TRACE_ID" ]]; then
       TRACE_ID="$(latest_elastic_trace_id)"
     fi
@@ -165,6 +231,19 @@ case "${SCENARIO:-}" in
 
     echo "[INFO] Escenario=${SCENARIO}; índice=${TRACE_INDEX_PATTERN:-traces-*}; trace_id=${TRACE_ID}" >&2
     query_elastic_trace "$TRACE_ID"
+    ;;
+  escenario_c)
+    if [[ -z "$TRACE_ID" ]]; then
+      TRACE_ID="$(latest_elastic_apm_trace_id)"
+    fi
+
+    if [[ -z "$TRACE_ID" ]]; then
+      echo "[ERROR] No se encontró TRACE_ID en ${TRACE_INDEX_PATTERN:-traces-apm*}" >&2
+      exit 1
+    fi
+
+    echo "[INFO] Escenario=${SCENARIO}; índice=${TRACE_INDEX_PATTERN:-traces-apm*}; trace.id=${TRACE_ID}" >&2
+    query_elastic_apm_trace "$TRACE_ID"
     ;;
   escenario_a)
     if [[ -z "$TRACE_ID" ]]; then
