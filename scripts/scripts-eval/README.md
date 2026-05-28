@@ -22,10 +22,18 @@ scripts/scripts-eval/env/escenario_b.env
 scripts/scripts-eval/env/escenario_c.env
 ```
 
-El fichero `scripts/scripts-eval/.env` es opcional, local e ignorado por git.
-Sirve para sobrescribir valores como `USERS`, `RUN_TIME`, `ELASTIC_PASSWORD` o
-`ENGINE_PASS`. Las variables ya exportadas en la shell tienen prioridad sobre
-los defaults y sobre `.env`.
+El fichero `.env` de la raíz del repositorio se carga antes de los defaults para
+reutilizar credenciales de Docker Compose como `ELASTIC_PASSWORD`. El fichero
+`scripts/scripts-eval/.env` es opcional, local e ignorado por git. Sirve para
+sobrescribir valores como `USERS`, `RUN_TIME` o `ENGINE_PASS`. Las variables ya
+exportadas en la shell tienen prioridad sobre ambos ficheros `.env` y sobre los
+defaults.
+
+Si el `.env` local declara un `SCENARIO` distinto al escenario activo, se
+ignoran sus claves acopladas al backend (`ENGINE_*`, `PROMETHEUS_URL` y
+`CONTAINER_REGEX`) para evitar arrastrar configuración de otra rama. Los
+overrides neutros como `USERS`, `RUN_TIME` o `SAMPLE_INTERVAL` se siguen
+aplicando.
 
 ## Uso básico
 
@@ -60,6 +68,9 @@ USERS=100 RUN_TIME=20m scripts/scripts-eval/run_experiment.sh
 | `collect_prometheus_snapshot.sh` | Solo Escenario A: consultas instantáneas a Prometheus. |
 | `summarize_prometheus_snapshot.py` | Resume targets, colas, fallos de exportación y métricas de ingesta Prometheus. |
 | `eval_env.sh` | Detección de rama, carga de defaults y resolución estable de rutas. |
+| `relacion-trace-span.sh` | Consulta spans de una traza. En B usa campos OTLP (`trace_id`, `span_id`, `parent_span_id`); en C usa campos Elastic APM/ECS (`trace.id`, `span.id`, `parent.id`). |
+| `logs.sh` | Consulta logs correlacionados con una traza. En B usa `logs-*` con `trace_id`; en C usa `logs-containerlogs-*` con `trace.id`. |
+| `servicios.sh` | Resume servicios observados. En B/C agrega sobre `traces-*` y `logs-*`; en A conserva la consulta de service map OpenSearch. |
 
 ## Variables principales
 
@@ -102,6 +113,9 @@ indices_summary.csv
 indices_total.csv
 backend_health_summary.csv
 backend_health_summary.json
+trace_correlation.env
+relacion_trace_span.json
+logs_correlacionados.json
 metadata.env
 ```
 
@@ -137,6 +151,9 @@ scripts/scripts-eval/results/escenario_a_20260524_120000/
 ├── indices_summary.csv
 ├── indices_total.csv
 ├── backend_health_summary.csv
+├── trace_correlation.env
+├── relacion_trace_span.json
+├── logs_correlacionados.json
 └── prometheus/
 ```
 

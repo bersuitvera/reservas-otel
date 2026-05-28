@@ -72,7 +72,7 @@ case "${SCENARIO:-}" in
     request "/_cat/indices/*service-map*?format=json&bytes=mb" "${OUT_DIR}/indices_opensearch_service_map_all.json"
     ;;
   escenario_b)
-    request "/_cat/data_streams?format=json" "${OUT_DIR}/data_streams.json"
+    request "/_data_stream/*" "${OUT_DIR}/data_streams.json"
     request "/_cat/indices/.ds-traces-*?format=json&bytes=mb" "${OUT_DIR}/indices_elastic_ds_traces.json"
     request "/_cat/indices/.ds-logs-*?format=json&bytes=mb" "${OUT_DIR}/indices_elastic_ds_logs.json"
     request "/_cat/indices/.ds-metrics-*?format=json&bytes=mb" "${OUT_DIR}/indices_elastic_ds_metrics.json"
@@ -81,7 +81,7 @@ case "${SCENARIO:-}" in
     request "/_data_stream/metrics-*" "${OUT_DIR}/data_streams_elastic_metrics.json"
     ;;
   escenario_c)
-    request "/_cat/data_streams?format=json" "${OUT_DIR}/data_streams.json"
+    request "/_data_stream/*" "${OUT_DIR}/data_streams.json"
     request "/_cat/indices/.ds-traces-apm*?format=json&bytes=mb" "${OUT_DIR}/indices_elastic_traces_apm.json"
     request "/_cat/indices/.ds-metrics-apm*?format=json&bytes=mb" "${OUT_DIR}/indices_elastic_metrics_apm.json"
     request "/_cat/indices/.ds-logs-containerlogs-*?format=json&bytes=mb" "${OUT_DIR}/indices_elastic_logs_containerlogs.json"

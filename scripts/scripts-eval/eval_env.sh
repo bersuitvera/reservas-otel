@@ -3,6 +3,7 @@
 
 EVAL_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 EVAL_REPO_ROOT="$(cd "${EVAL_SCRIPT_DIR}/../.." && pwd)"
+EVAL_COMPOSE_ENV_FILE="${EVAL_COMPOSE_ENV_FILE:-${EVAL_REPO_ROOT}/.env}"
 EVAL_ENV_FILE="${EVAL_ENV_FILE:-${EVAL_SCRIPT_DIR}/.env}"
 EVAL_GIT_BRANCH="$(git -C "${EVAL_REPO_ROOT}" branch --show-current 2>/dev/null || true)"
 
@@ -51,6 +52,13 @@ eval_load_env_defaults() {
     value="$(eval_expand_env_value "$value")"
 
     if [[ "$mode" == "local" ]]; then
+      if [[ "${EVAL_LOCAL_ENV_SCENARIO_MISMATCH:-false}" == "true" ]] && eval_env_key_is_scenario_bound "$name"; then
+        continue
+      fi
+      if [[ -z "${EVAL_ORIGINAL_ENV[$name]+x}" ]]; then
+        export "${name}=${value}"
+      fi
+    elif [[ "$mode" == "compose" ]]; then
       if [[ -z "${EVAL_ORIGINAL_ENV[$name]+x}" ]]; then
         export "${name}=${value}"
       fi
@@ -82,6 +90,42 @@ eval_expand_env_value() {
   done
 
   printf '%s' "$value"
+}
+
+eval_read_env_value() {
+  local env_file="$1"
+  local key="$2"
+  local line name value
+
+  [[ -f "$env_file" ]] || return 0
+
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    line="$(eval_trim "$line")"
+    [[ -z "$line" || "$line" == \#* ]] && continue
+    [[ "$line" == export\ * ]] && line="$(eval_trim "${line#export }")"
+    [[ "$line" != *=* ]] && continue
+
+    name="$(eval_trim "${line%%=*}")"
+    [[ "$name" != "$key" ]] && continue
+
+    value="$(eval_trim "${line#*=}")"
+    if [[ "$value" =~ ^\".*\"$ || "$value" =~ ^\'.*\'$ ]]; then
+      value="${value:1:${#value}-2}"
+    fi
+    eval_expand_env_value "$value"
+    return 0
+  done < "$env_file"
+}
+
+eval_env_key_is_scenario_bound() {
+  case "$1" in
+    SCENARIO|CONTAINER_REGEX|ENGINE_URL|ENGINE_USER|ENGINE_PASS|ENGINE_INSECURE|PROMETHEUS_URL)
+      return 0
+      ;;
+    *)
+      return 1
+      ;;
+  esac
 }
 
 eval_detect_scenario() {
@@ -142,12 +186,22 @@ fi
 
 EVAL_SCENARIO_DEFAULTS_FILE="${EVAL_SCENARIO_DEFAULTS_FILE:-${EVAL_SCRIPT_DIR}/env/${SCENARIO}.env}"
 
+eval_load_env_defaults "$EVAL_COMPOSE_ENV_FILE" "compose"
 eval_load_env_defaults "$EVAL_SCENARIO_DEFAULTS_FILE" "defaults"
+
+EVAL_LOCAL_ENV_SCENARIO="$(eval_read_env_value "$EVAL_ENV_FILE" "SCENARIO")"
+EVAL_LOCAL_ENV_SCENARIO_MISMATCH=false
+
+if [[ -n "$EVAL_LOCAL_ENV_SCENARIO" && "$EVAL_LOCAL_ENV_SCENARIO" != "${SCENARIO:-}" ]]; then
+  EVAL_LOCAL_ENV_SCENARIO_MISMATCH=true
+  echo "[WARN] ${EVAL_ENV_FILE} declara SCENARIO=${EVAL_LOCAL_ENV_SCENARIO}, pero el escenario activo es ${SCENARIO:-unknown}. Se ignoran overrides locales de backend/stack." >&2
+fi
+
 eval_load_env_defaults "$EVAL_ENV_FILE" "local"
 
 EVAL_BACKEND="$(eval_detect_backend "${SCENARIO:-}")"
 EVAL_OBSERVABILITY_STACK="$(eval_detect_observability_stack "${SCENARIO:-}")"
 
-export EVAL_SCRIPT_DIR EVAL_REPO_ROOT EVAL_ENV_FILE
+export EVAL_SCRIPT_DIR EVAL_REPO_ROOT EVAL_COMPOSE_ENV_FILE EVAL_ENV_FILE
 export EVAL_GIT_BRANCH EVAL_DETECTED_SCENARIO EVAL_SCENARIO_DEFAULTS_FILE
 export EVAL_BACKEND EVAL_OBSERVABILITY_STACK

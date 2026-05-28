@@ -54,6 +54,77 @@ fi
 
 mkdir -p "$OUT_DIR"
 
+extract_correlation_trace_id() {
+  local json_file="$1"
+
+  python3 - "$json_file" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+path = Path(sys.argv[1])
+try:
+    payload = json.loads(path.read_text(encoding="utf-8"))
+except Exception:
+    sys.exit(0)
+
+if isinstance(payload, dict):
+    spans = payload.get("spans")
+    if isinstance(spans, list):
+        for span in spans:
+            if isinstance(span, dict) and span.get("trace_id"):
+                print(span["trace_id"])
+                sys.exit(0)
+            if isinstance(span, dict) and span.get("trace", {}).get("id"):
+                print(span["trace"]["id"])
+                sys.exit(0)
+
+    hits = payload.get("hits", {}).get("hits", [])
+    if isinstance(hits, list):
+        for hit in hits:
+            source = hit.get("_source", {}) if isinstance(hit, dict) else {}
+            trace_id = source.get("traceId") or source.get("trace_id") or source.get("trace", {}).get("id")
+            if trace_id:
+                print(trace_id)
+                sys.exit(0)
+PY
+}
+
+collect_trace_correlation_evidence() {
+  local trace_span_out="${OUT_DIR}/relacion_trace_span.json"
+  local trace_span_err="${OUT_DIR}/relacion_trace_span.stderr"
+  local logs_out="${OUT_DIR}/logs_correlacionados.json"
+  local logs_err="${OUT_DIR}/logs_correlacionados.stderr"
+  local trace_env="${OUT_DIR}/trace_correlation.env"
+  local correlation_trace_id="${TRACE_ID:-}"
+
+  echo "[INFO] Recogiendo relación trace/span y logs correlacionados"
+  echo "TRACE_ID=${correlation_trace_id}" > "$trace_env"
+
+  if [[ -n "$correlation_trace_id" ]]; then
+    if ! "${SCRIPT_DIR}/relacion-trace-span.sh" "$correlation_trace_id" > "$trace_span_out" 2> "$trace_span_err"; then
+      echo "[WARN] No se pudo recoger la relación trace/span. Ver ${trace_span_err}" >&2
+    fi
+  elif "${SCRIPT_DIR}/relacion-trace-span.sh" > "$trace_span_out" 2> "$trace_span_err"; then
+    correlation_trace_id="$(extract_correlation_trace_id "$trace_span_out")"
+    if [[ -n "$correlation_trace_id" ]]; then
+      echo "TRACE_ID=${correlation_trace_id}" > "$trace_env"
+    fi
+  else
+    echo "[WARN] No se pudo recoger la relación trace/span. Ver ${trace_span_err}" >&2
+  fi
+
+  if [[ -n "$correlation_trace_id" ]]; then
+    if ! "${SCRIPT_DIR}/logs.sh" "$correlation_trace_id" > "$logs_out" 2> "$logs_err"; then
+      echo "[WARN] No se pudieron recoger logs correlacionados para TRACE_ID=${correlation_trace_id}. Ver ${logs_err}" >&2
+    fi
+  else
+    if ! "${SCRIPT_DIR}/logs.sh" > "$logs_out" 2> "$logs_err"; then
+      echo "[WARN] No se pudieron recoger logs correlacionados. Ver ${logs_err}" >&2
+    fi
+  fi
+}
+
 cat > "${OUT_DIR}/metadata.env" <<EOF
 GIT_BRANCH=${EVAL_GIT_BRANCH}
 DETECTED_SCENARIO=${EVAL_DETECTED_SCENARIO}
@@ -135,6 +206,8 @@ echo "[INFO] Recogiendo datos de índices/data streams"
 "${SCRIPT_DIR}/collect_indices.sh" "${OUT_DIR}" || {
   echo "[WARN] No se pudieron recoger todos los datos de índices. Revisa ENGINE_URL/credenciales."
 }
+
+collect_trace_correlation_evidence
 
 if [[ -n "${PROMETHEUS_URL:-}" ]]; then
   echo "[INFO] Recogiendo snapshot de Prometheus"

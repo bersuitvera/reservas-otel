@@ -24,6 +24,7 @@ __pycache__/
 htmlcov/
 .tox/
 .nox/
+scripts/scripts-eval/results/
 
 # Build / packaging artifacts
 build/
@@ -50,6 +51,3 @@ ENV/
 # Local docker volumes/data
 opensearch-data/
 elasticsearch-data/
-
-# Evaluation outputs
-scripts/scripts-eval/results/
