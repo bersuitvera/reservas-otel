@@ -24,6 +24,7 @@ __pycache__/
 htmlcov/
 .tox/
 .nox/
+scripts/scripts-eval/results/
 
 # Build / packaging artifacts
 build/
@@ -37,6 +38,8 @@ pip-wheel-metadata/
 venv/
 env/
 ENV/
+!scripts/scripts-eval/env/
+!scripts/scripts-eval/env/*.env
 
 # Environment variables
 .env
