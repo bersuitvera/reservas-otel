@@ -55,6 +55,23 @@ latest_elastic_trace_id() {
 JSON
 }
 
+latest_elastic_apm_trace_id() {
+  search_json "${LOG_INDEX_PATTERN:-logs-containerlogs-*}" <<'JSON' | jq -r '.hits.hits[0]._source.trace.id // empty'
+{
+  "size": 1,
+  "_source": ["trace.id"],
+  "query": {
+    "exists": {
+      "field": "trace.id"
+    }
+  },
+  "sort": [
+    { "@timestamp": { "order": "desc" } }
+  ]
+}
+JSON
+}
+
 latest_opensearch_trace_id() {
   search_json "${LOG_INDEX_PATTERN:-logs-otel-v1*}" <<'JSON' | jq -r '.hits.hits[0]._source.traceId // empty'
 {
@@ -109,6 +126,42 @@ query_elastic_logs() {
 JSON
 }
 
+query_elastic_apm_logs() {
+  local trace_id="$1"
+  search_json "${LOG_INDEX_PATTERN:-logs-containerlogs-*}" <<JSON | jq '. as $root | {
+  total: $root.hits.total,
+  logs: [
+    $root.hits.hits[] | {
+      index: ._index,
+      timestamp: ._source["@timestamp"],
+      trace_id: ._source.trace.id,
+      span_id: ._source.span.id,
+      service_name: ._source.service.name,
+      container_name: ._source.container.name,
+      log_level: ._source["log.level"],
+      message: ._source.message,
+      event_dataset: ._source.event.dataset,
+      event_original: ._source.event.original,
+      code_file: (._source.log.origin.file.name // ._source["log.origin"].file.name),
+      code_function: (._source.log.origin.function // ._source["log.origin"].function),
+      code_line: (._source.log.origin.file.line // ._source["log.origin"].file.line)
+    }
+  ]
+}'
+{
+  "size": ${SIZE},
+  "query": {
+    "term": {
+      "trace.id": "${trace_id}"
+    }
+  },
+  "sort": [
+    { "@timestamp": { "order": "asc" } }
+  ]
+}
+JSON
+}
+
 query_opensearch_logs() {
   local trace_id="$1"
   search_json "${LOG_INDEX_PATTERN:-logs-otel-v1*}" <<JSON
@@ -127,7 +180,7 @@ JSON
 }
 
 case "${SCENARIO:-}" in
-  escenario_b|escenario_c)
+  escenario_b)
     if [[ -z "$TRACE_ID" ]]; then
       TRACE_ID="$(latest_elastic_trace_id)"
     fi
@@ -139,6 +192,19 @@ case "${SCENARIO:-}" in
 
     echo "[INFO] Escenario=${SCENARIO}; índice=${LOG_INDEX_PATTERN:-logs-*}; trace_id=${TRACE_ID}" >&2
     query_elastic_logs "$TRACE_ID"
+    ;;
+  escenario_c)
+    if [[ -z "$TRACE_ID" ]]; then
+      TRACE_ID="$(latest_elastic_apm_trace_id)"
+    fi
+
+    if [[ -z "$TRACE_ID" ]]; then
+      echo "[ERROR] No se encontró TRACE_ID en ${LOG_INDEX_PATTERN:-logs-containerlogs-*}" >&2
+      exit 1
+    fi
+
+    echo "[INFO] Escenario=${SCENARIO}; índice=${LOG_INDEX_PATTERN:-logs-containerlogs-*}; trace.id=${TRACE_ID}" >&2
+    query_elastic_apm_logs "$TRACE_ID"
     ;;
   escenario_a)
     if [[ -z "$TRACE_ID" ]]; then
