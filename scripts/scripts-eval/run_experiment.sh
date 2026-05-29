@@ -125,6 +125,26 @@ collect_trace_correlation_evidence() {
   fi
 }
 
+collect_services_evidence() {
+  local services_out="${OUT_DIR}/servicios.json"
+  local services_err="${OUT_DIR}/servicios.stderr"
+  local trace_env="${OUT_DIR}/trace_correlation.env"
+  local correlation_trace_id="${TRACE_ID:-}"
+
+  if [[ -z "$correlation_trace_id" && -f "$trace_env" ]]; then
+    correlation_trace_id="$(sed -n 's/^TRACE_ID=//p' "$trace_env" | tail -n 1)"
+  fi
+
+  echo "[INFO] Recogiendo resumen de servicios observados"
+  if [[ -n "$correlation_trace_id" ]]; then
+    if ! "${SCRIPT_DIR}/servicios.sh" "$correlation_trace_id" > "$services_out" 2> "$services_err"; then
+      echo "[WARN] No se pudo recoger resumen de servicios para TRACE_ID=${correlation_trace_id}. Ver ${services_err}" >&2
+    fi
+  elif ! "${SCRIPT_DIR}/servicios.sh" > "$services_out" 2> "$services_err"; then
+    echo "[WARN] No se pudo recoger resumen de servicios. Ver ${services_err}" >&2
+  fi
+}
+
 cat > "${OUT_DIR}/metadata.env" <<EOF
 GIT_BRANCH=${EVAL_GIT_BRANCH}
 DETECTED_SCENARIO=${EVAL_DETECTED_SCENARIO}
@@ -208,6 +228,7 @@ echo "[INFO] Recogiendo datos de índices/data streams"
 }
 
 collect_trace_correlation_evidence
+collect_services_evidence
 
 if [[ -n "${PROMETHEUS_URL:-}" ]]; then
   echo "[INFO] Recogiendo snapshot de Prometheus"

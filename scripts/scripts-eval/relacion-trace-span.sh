@@ -79,20 +79,17 @@ JSON
 }
 
 latest_opensearch_trace_id() {
-  search_json "${TRACE_INDEX_PATTERN:-otel-v1-apm-span-*}" <<'JSON' | jq -r '.hits.hits[0]._source.traceId // empty'
+  search_json "${LOG_INDEX_PATTERN:-logs-otel-v1*}" <<'JSON' | jq -r '.hits.hits[0]._source.traceId // empty'
 {
   "size": 1,
   "_source": ["traceId"],
   "query": {
-    "bool": {
-      "must": [
-        { "exists": { "field": "traceId" } },
-        { "exists": { "field": "parentSpanId" } }
-      ]
+    "exists": {
+      "field": "traceId"
     }
   },
   "sort": [
-    { "startTime": { "order": "desc" } }
+    { "@timestamp": { "order": "desc" } }
   ]
 }
 JSON
@@ -189,7 +186,33 @@ JSON
 
 query_opensearch_trace() {
   local trace_id="$1"
-  search_json "${TRACE_INDEX_PATTERN:-otel-v1-apm-span-*}" <<JSON
+  search_json "${TRACE_INDEX_PATTERN:-otel-v1-apm-span-*}" <<JSON | jq '. as $root | {
+  total: $root.hits.total,
+  spans: [
+    $root.hits.hits[] | {
+      index: ._index,
+      timestamp: ._source.startTime,
+      trace_id: ._source.traceId,
+      span_id: ._source.spanId,
+      parent_span_id: ._source.parentSpanId,
+      service_name: (._source.serviceName // ._source.resource.attributes["service.name"]),
+      name: ._source.name,
+      kind: ._source.kind,
+      duration_ns: ._source.durationInNanos,
+      status_code: ._source.status.code,
+      http_method: ._source.attributes["http.method"],
+      http_route: ._source.attributes["http.route"],
+      http_status_code: ._source.attributes["http.status_code"],
+      app_user_id: ._source.attributes.app_user_id,
+      app_room_id: ._source.attributes.app_room_id,
+      app_reservation_id: ._source.attributes.app_reservation_id,
+      app_reservation_status: ._source.attributes["app.reservation.status"],
+      app_event_type: ._source.attributes.app_event_type,
+      app_received_traceparent: ._source.attributes.app_received_traceparent,
+      app_propagated_traceparent: ._source.attributes.app_propagated_traceparent
+    }
+  ]
+}'
 {
   "size": ${SIZE},
   "_source": [
@@ -197,6 +220,7 @@ query_opensearch_trace() {
     "spanId",
     "parentSpanId",
     "serviceName",
+    "resource.attributes.service.name",
     "name",
     "kind",
     "startTime",
@@ -204,7 +228,14 @@ query_opensearch_trace() {
     "status.code",
     "attributes.http.method",
     "attributes.http.route",
-    "attributes.http.status_code"
+    "attributes.http.status_code",
+    "attributes.app_user_id",
+    "attributes.app_room_id",
+    "attributes.app_reservation_id",
+    "attributes.app.reservation.status",
+    "attributes.app_event_type",
+    "attributes.app_received_traceparent",
+    "attributes.app_propagated_traceparent"
   ],
   "query": {
     "term": {

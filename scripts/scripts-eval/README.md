@@ -70,7 +70,7 @@ USERS=100 RUN_TIME=20m scripts/scripts-eval/run_experiment.sh
 | `eval_env.sh` | Detección de rama, carga de defaults y resolución estable de rutas. |
 | `relacion-trace-span.sh` | Consulta spans de una traza. En B usa campos OTLP (`trace_id`, `span_id`, `parent_span_id`); en C usa campos Elastic APM/ECS (`trace.id`, `span.id`, `parent.id`). |
 | `logs.sh` | Consulta logs correlacionados con una traza. En B usa `logs-*` con `trace_id`; en C usa `logs-containerlogs-*` con `trace.id`. |
-| `servicios.sh` | Resume servicios observados. En B/C agrega sobre `traces-*` y `logs-*`; en A conserva la consulta de service map OpenSearch. |
+| `servicios.sh` | Resume servicios observados y servicios implicados en una traza. En A agrega sobre `otel-v1-apm-span-*`, `logs-otel-v1*` y conserva service map OpenSearch si existe; en B usa campos OTLP Elastic; en C usa campos Elastic APM/ECS. |
 
 ## Variables principales
 
@@ -116,6 +116,7 @@ backend_health_summary.json
 trace_correlation.env
 relacion_trace_span.json
 logs_correlacionados.json
+servicios.json
 metadata.env
 ```
 

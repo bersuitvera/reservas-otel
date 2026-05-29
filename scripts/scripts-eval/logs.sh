@@ -164,12 +164,32 @@ JSON
 
 query_opensearch_logs() {
   local trace_id="$1"
-  search_json "${LOG_INDEX_PATTERN:-logs-otel-v1*}" <<JSON
+  search_json "${LOG_INDEX_PATTERN:-logs-otel-v1*}" <<JSON | jq '. as $root | {
+  total: $root.hits.total,
+  logs: [
+    $root.hits.hits[] | {
+      index: ._index,
+      timestamp: (._source["@timestamp"] // ._source.time),
+      observed_timestamp: ._source.observedTimestamp,
+      trace_id: ._source.traceId,
+      span_id: ._source.spanId,
+      service_name: ._source.resource.attributes["service.name"],
+      scope_name: ._source.instrumentationScope.name,
+      severity_text: ._source.severityText,
+      severity_number: ._source.severityNumber,
+      body: ._source.body,
+      event: ._source.attributes.event,
+      code_file: ._source.attributes["code.file.path"],
+      code_function: ._source.attributes["code.function.name"],
+      code_line: ._source.attributes["code.line.number"]
+    }
+  ]
+}'
 {
   "size": ${SIZE},
   "query": {
-    "query_string": {
-      "query": "${trace_id}"
+    "term": {
+      "traceId": "${trace_id}"
     }
   },
   "sort": [
