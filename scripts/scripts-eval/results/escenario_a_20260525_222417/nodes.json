@@ -1,1 +1,0 @@
-[{"ip":"172.18.0.3","heap.percent":"52","ram.percent":"86","cpu":"35","load_1m":"1.98","load_5m":"1.56","load_15m":"1.33","node.role":"dimr","node.roles":"cluster_manager,data,ingest,remote_cluster_client","cluster_manager":"*","name":"29fa7c807076"}]

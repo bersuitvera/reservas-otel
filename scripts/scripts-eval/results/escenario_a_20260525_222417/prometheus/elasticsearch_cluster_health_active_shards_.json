@@ -1,1 +1,0 @@
-{"status":"success","data":{"resultType":"vector","result":[{"metric":{"__name__":"elasticsearch_cluster_health_active_shards","cluster":"docker-cluster","component":"search-storage","instance":"opensearch-exporter:9114","job":"opensearch","service":"opensearch"},"value":[1779741289.563,"19"]}]}}
